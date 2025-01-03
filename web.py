@@ -6,12 +6,13 @@ import seaborn as sns
 import plotly.express as px
 
 # Create a sidebar
-st.sidebar.header("Sidebar")
-st.sidebar.write("This is the sidebar content.")
+st.sidebar.header("Sample information")
+st.sidebar.write("This part is needed for every file that we are creating..")
+
+# Inputs
 plate_name = st.sidebar.text_input("Enter your plate name", "Type Here")
 organism = st.sidebar.text_input("Enter your organism", "Type Here")
 sample = st.sidebar.text_input("Enter your sample", "Type Here")
-# Add download button
 
 
 
