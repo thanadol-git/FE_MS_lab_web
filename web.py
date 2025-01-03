@@ -8,6 +8,12 @@ import plotly.express as px
 # Create a sidebar
 st.sidebar.header("Sidebar")
 st.sidebar.write("This is the sidebar content.")
+plate_name = st.sidebar.text_input("Enter your plate name", "Type Here")
+organism = st.sidebar.text_input("Enter your organism", "Type Here")
+sample = st.sidebar.text_input("Enter your sample", "Type Here")
+# Add download button
+
+
 
 # Create three tabs
 plate_tab, dia_tab, dda_tab, srm_tab = st.tabs(["Plate", "DIA", "DDA", "SRM"])
@@ -18,14 +24,31 @@ with plate_tab:
     st.header("Plate layout")
     
     # Sample types 
-    st.subheader("1. Cohort name")
-    sample_name = st.text_input("Main cohort name/abbreviation", "Cohort_1")
-    st.write("The sample will be names: ", sample_name)
+    st.subheader("A. Cohort name")
+    sample_name = st.text_input("1.Main cohort name/abbreviation", "Cohort_1")
+    st.markdown(f"The main cohort samples will be: <span style='color:red'>{sample_name}</span>", unsafe_allow_html=True)
+
+    # plate id 
+    plate_id = st.text_input("2.Enter your plate ID", "")
+    if not plate_id:
+        plate_id = sample_name
+    st.markdown(f"Plate ID: <span style='color:red'>{plate_id}</span>", unsafe_allow_html=True)
+
 
 
     st.subheader("2. Control or Pool")
     st.write("This is a list of control or pool.")
-    replace_pos = st.text_area("Example Ctrl, Pool or another cohort", "Pool;A7\nCtrl;H11\nCtrl;H12\nCohort2;C8").split('\n')
+    replace_pos = st.text_area("Example Ctrl, Pool or another cohort", "Pool;A7\nCtrl;G12\nCtrl;H12\nCohort_2;C8").split('\n')
+    # Write a  warning message if the position is mentioned more than one time in text area
+    # Check if the position is mentioned more than one time
+    pos_list = []
+    for item in replace_pos:
+        if ';' in item:
+            text, pos = item.split(';')
+            pos_list.append(pos)
+    if len(pos_list) != len(set(pos_list)):
+        st.warning("Position is mentioned more than one time")
+
 
     # Ensure the dataframe has 12 columns and 8 rows
     data = np.resize(sample_name, (8, 12))
@@ -57,11 +80,10 @@ with plate_tab:
     color_df = plate_df.applymap(lambda x: color_mapping.get(x, (1, 1, 1)))
 
     # Plot the heatmap with discrete text colors
-    sns.heatmap(plate_df.isnull(), cbar=False, cmap='viridis', ax=ax, linewidths=0.5, linecolor='darkgrey', alpha=0.0)
+    sns.heatmap(plate_df.isnull(), cbar=False, cmap='viridis', ax=ax, linewidths=1, linecolor='darkgrey', alpha=0.1)
     ax.xaxis.tick_top()  # Move the x-axis labels to the top
-    ax.tick_params(axis='y', rotation=0)  # Keep y-axis ticks straight
-    # keep x axis label straight
-    ax.tick_params(axis='x', rotation=0)  # Keep x-axis ticks straight
+    # fix label rotation on y to be straight
+    ax.set_yticklabels(ax.get_yticklabels(), rotation=0)
 
     # Plot the heatmap with discrete text colors
     sns.heatmap(plate_df.isnull(), cbar=False, cmap='magma', ax=ax, linewidths=0.5, linecolor='darkgrey', alpha = 0.0)
@@ -72,11 +94,17 @@ with plate_tab:
             ax.add_patch(plt.Circle((j + 0.5, i + 0.5), 0.4, color=color, fill=True))
             ax.text(j + 0.5, i + 0.5, f'{value}', ha='center', va='center', color='white', fontsize=4)
 
+    # Overlay ticks and labels
+    # ax.set_xticks(np.arange(len(plate_df.columns)) + 0.5)
+    # ax.set_yticks(np.arange(len(plate_df.index)) + 0.5)
+    # ax.set_xticklabels(plate_df.columns)
+    ax.set_yticklabels(plate_df.index, rotation=0)
+
     st.pyplot(fig)
 
-# Content for Tab 1
+# Content for DIA 
 with dia_tab:
-    st.header("FE DIA")
+    st.header("DIA")
     st.write("This is the content of the first tab.")
     # Interactive plot
     df = pd.DataFrame({
@@ -87,9 +115,9 @@ with dia_tab:
     st.plotly_chart(fig)
 
 
-# Content for Tab 2
+# Content for DDA
 with dda_tab:
-    st.header("FE DDA")
+    st.header("DDA")
     st.write("This is the content of the second tab.")
     # Editable plot
     df = pd.DataFrame({
@@ -101,7 +129,7 @@ with dda_tab:
 
 # Content for Tab 3
 with srm_tab:
-    st.header("FE SRM")
+    st.header("SRM or Targeted proteomics")
     st.write("This is the content of the third tab.")
     # Another interactive plot
     df = pd.DataFrame({
@@ -110,3 +138,4 @@ with srm_tab:
     })
     fig = px.histogram(df, x='x', title="Interactive Histogram")
     st.plotly_chart(fig)
+
