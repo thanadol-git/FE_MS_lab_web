@@ -16,36 +16,61 @@ plate_tab, dia_tab, dda_tab, srm_tab = st.tabs(["Plate", "DIA", "DDA", "SRM"])
 # content for Plate 
 with plate_tab:
     st.header("Plate layout")
+    
     # Sample types 
-    # Add text area here 
-    st.subheader("Sample types")
-    st.write("This is a list of sample types.")
-    sample_types = st.text_area("Sample types", "Sample\nPool\nCtrl").split('\n')
+    st.subheader("1. Cohort name")
+    sample_name = st.text_input("Main cohort name/abbreviation", "Cohort_1")
+    st.write("The sample will be names: ", sample_name)
+
+
+    st.subheader("2. Control or Pool")
+    st.write("This is a list of control or pool.")
+    replace_pos = st.text_area("Example Ctrl, Pool or another cohort", "Pool;A7\nCtrl;H11\nCtrl;H12\nCohort2;C8").split('\n')
 
     # Ensure the dataframe has 12 columns and 8 rows
-    data = np.resize(sample_types, (8, 12))
-    df = pd.DataFrame(data, columns=[str(i) for i in range(1, 13)], index=list('ABCDEFGH'))
-    st.write(df)
+    data = np.resize(sample_name, (8, 12))
+    plate_df = pd.DataFrame(data, columns=[str(i) for i in range(1, 13)], index=list('ABCDEFGH'))
+    
+        # Replace text in the dataframe based on replace_pos
+    for item in replace_pos:
+        if ';' in item:
+            text, pos = item.split(';')
+            row = pos[0]
+            col = int(pos[1:]) - 1
+            plate_df.at[row, str(col + 1)] = text
+
+    
+    st.write(plate_df)
 
     # header 
-    st.subheader("Heatmap")
-    # Show a heatmap
-    # set size to be 127x85
+    st.subheader("3. Layout of plate")
+    
+    # Heatmap of plate location 
+    # from plate_df to heatmap
+    fig, ax = plt.subplots()
+    # Create a color palette for discrete text
+    unique_texts = plate_df.stack().unique()
+    palette = sns.color_palette("viridis", len(unique_texts))
+    color_mapping = {text: palette[i] for i, text in enumerate(unique_texts)}
 
-    fig, ax = plt.subplots(figsize=(12.7, 8.5))
+    # Create a new DataFrame for the colors
+    color_df = plate_df.applymap(lambda x: color_mapping.get(x, (1, 1, 1)))
+
+    # Plot the heatmap with discrete text colors
+    sns.heatmap(plate_df.isnull(), cbar=False, cmap='viridis', ax=ax, linewidths=0.5, linecolor='darkgrey', alpha=0.0)
     ax.xaxis.tick_top()  # Move the x-axis labels to the top
-    sns.heatmap(df, ax=ax, cbar=False, annot=False, xticklabels=True, yticklabels=True, alpha=0, linewidths=0.5, linecolor='darkgrey')
     ax.tick_params(axis='y', rotation=0)  # Keep y-axis ticks straight
+    # keep x axis label straight
+    ax.tick_params(axis='x', rotation=0)  # Keep x-axis ticks straight
 
-
-    # Add circular cells with color
-    norm = plt.Normalize(df.min().min(), df.max().max())
-    for i in range(df.shape[0]):
-        for j in range(df.shape[1]):
-            value = df.iloc[i, j]
-            color = plt.cm.viridis(norm(value))
-            ax.add_patch(plt.Circle((j + 0.5, i + 0.5), 0.3, color=color, fill=True))
-            ax.text(j + 0.5, i + 0.5, f'{value:.2f}', ha='center', va='center', color='white', fontsize=8)
+    # Plot the heatmap with discrete text colors
+    sns.heatmap(plate_df.isnull(), cbar=False, cmap='magma', ax=ax, linewidths=0.5, linecolor='darkgrey', alpha = 0.0)
+    for i in range(plate_df.shape[0]):
+        for j in range(plate_df.shape[1]):
+            value = plate_df.iloc[i, j]
+            color = color_mapping.get(value, (1, 1, 1))
+            ax.add_patch(plt.Circle((j + 0.5, i + 0.5), 0.4, color=color, fill=True))
+            ax.text(j + 0.5, i + 0.5, f'{value}', ha='center', va='center', color='white', fontsize=4)
 
     st.pyplot(fig)
 
