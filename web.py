@@ -12,6 +12,8 @@ st.sidebar.write("This part is needed for every file that we are creating..")
 # Inputs
 plate_name = st.sidebar.text_input("Enter your plate name", "Type Here")
 organism = st.sidebar.text_input("Enter your organism", "Type Here")
+# Change organism to be a dropdown
+organism = st.sidebar.selectbox("Select your organism", ["Human", "Rat","Other"])
 sample = st.sidebar.text_input("Enter your sample", "Type Here")
 
 
