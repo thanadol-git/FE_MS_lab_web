@@ -1,7 +1,13 @@
 # FE_DIA_sdrf
 
 ## Priority
-- DDA -> DIA -> SRM 
+
+SDRF
+- [x] DDA 
+- [x] DIA 
+- [ ] SRM : To discuss with David
+
+ 
 
 ## To do 
 - Read SDRF paper clearly 
