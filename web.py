@@ -24,7 +24,7 @@ sample_name = st.sidebar.text_input("1.Main cohort name/abbreviation", "Cohort_1
 
 
 # Create three tabs
-plate_tab, dia_tab, dda_tab, srm_tab = st.tabs(["Plate Design", "DIA", "DDA", "SRM"])
+plate_tab, sample_order, dda_tab, srm_tab = st.tabs(["Plate Design", "Sample Order"])
 
 
 # content for Plate 
@@ -118,8 +118,11 @@ with plate_tab:
     st.pyplot(fig)
 
 # Content for DIA 
-with dia_tab:
+with sample_order:
     st.header("DIA Injection")
+    
+    # Acquisition technique 
+    acq_tech = st.selectbox("1.Select your acquisition", ["DDA", "DIA", "SRM"])
 
     # Choices Injection position with select boxes from red green and blue 
     injection_pos = st.selectbox("1.Select your injection position", ["Red", "Green", "Blue"])
@@ -134,7 +137,7 @@ with dia_tab:
     st.write(f"The corresponding letter for {injection_pos} is {injection_pos_letter}")
 
     # Injection volumes
-    injection_vol = st.slider("2.Select your injection volume", 0.01, 0.1, 0.01, 0.01)
+    injection_vol = st.slider("2.Select your injection volume", 0.01, 5.0, 0.01, 0.01)
     st.markdown(f"Selected injection volume (ul): <span style='color:red'>{injection_vol}</span>", unsafe_allow_html=True)
     
     # Path to the data
@@ -227,6 +230,7 @@ with dia_tab:
     
     ## Download button for export file
     st.markdown("### Download data")
+    
     st.markdown("The data below is an example for sample order in Xcalibur. The injection order will be randomized and added with wash and qc standard.")
     st.write(output_order_df)
     st.markdown("Click below to download the data.") 
@@ -238,29 +242,4 @@ with dia_tab:
         mime='csv'
     )
         
-
-
-# Content for DDA
-# with dda_tab:
-    # st.header("DDA")
-    # st.write("This is the content of the second tab.")
-    # # Editable plot
-    # df = pd.DataFrame({
-    #     'x': np.random.randn(100),
-    #     'y': np.random.randn(100)
-    # })
-    # fig = px.line(df, x='x', y='y', title="Editable Line Plot")
-    # st.plotly_chart(fig)
-
-# Content for Tab 3
-# with srm_tab:
-    # st.header("SRM or Targeted proteomics")
-    # st.write("This is the content of the third tab.")
-    # # Another interactive plot
-    # df = pd.DataFrame({
-    #     'x': np.random.randn(100),
-    #     'y': np.random.randn(100)
-    # })
-    # fig = px.histogram(df, x='x', title="Interactive Histogram")
-    # st.plotly_chart(fig)
 
