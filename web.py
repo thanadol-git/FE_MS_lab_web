@@ -12,8 +12,8 @@ st.sidebar.write("This part is needed for every file that we are creating..")
 # Inputs
 plate_name = st.sidebar.text_input("Enter your plate name", "Type Here")
 # Organism
-organism = st.sidebar.selectbox("Select your organism", ["Human", "Rat","Other"])
-sample = st.sidebar.text_input("Enter your sample", "Type Here")
+organism = st.sidebar.text_input("Select your organism", "Human")
+sample = st.sidebar.text_input("Enter your sample", "Plasma")
 
 
 
@@ -40,7 +40,7 @@ with plate_tab:
 
     st.subheader("2. Control or Pool")
     st.write("This is a list of control or pool.")
-    replace_pos = st.text_area("Example Ctrl, Pool or another cohort", "Pool;A7\nCtrl;G12\nCtrl;H12\nCohort_2;C8").split('\n')
+    replace_pos = st.text_area("Example Control, Pool or another cohort", "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8").split('\n')
     # Write a  warning message if the position is mentioned more than one time in text area
     # Check if the position is mentioned more than one time
     pos_list = []
@@ -56,7 +56,7 @@ with plate_tab:
     data = np.resize(sample_name, (8, 12))
     plate_df = pd.DataFrame(data, columns=[str(i) for i in range(1, 13)], index=list('ABCDEFGH'))
     
-        # Replace text in the dataframe based on replace_pos
+    # Replace text in the dataframe based on replace_pos
     for item in replace_pos:
         if ';' in item:
             text, pos = item.split(';')
@@ -69,6 +69,8 @@ with plate_tab:
 
     # header 
     st.subheader("3. Layout of plate")
+    
+    
     
     # Heatmap of plate location 
     # from plate_df to heatmap
@@ -107,37 +109,60 @@ with plate_tab:
 # Content for DIA 
 with dia_tab:
     st.header("DIA")
-    st.write("This is the content of the first tab.")
-    # Interactive plot
-    df = pd.DataFrame({
-        'x': np.random.randn(100),
-        'y': np.random.randn(100)
-    })
-    fig = px.scatter(df, x='x', y='y', title="Interactive Scatter Plot")
-    st.plotly_chart(fig)
+
+    # Choices Injection position with select boxes from red green and blue 
+    injection_pos = st.selectbox("1.Select your injection position", ["Red", "Green", "Blue"])
+    st.markdown(f"Selected injection position: <span style='color:red'>{injection_pos}</span>", unsafe_allow_html=True)
+    
+    # Injection volumes
+    injection_vol = st.slider("2.Select your injection volume", 0.01, 0.1, 0.05, 0.01)
+    st.markdown(f"Selected injection volume (ul): <span style='color:red'>{injection_vol}</span>", unsafe_allow_html=True)
+    
+    # Path to the data
+    uploaded_dir = st.text_input("3.Enter the directory path to the data", "C:\data\yourdir")
+    st.markdown(f"The data will be saved at: <span style='color:red'>{uploaded_dir}</span>", unsafe_allow_html=True)
+    
+    # Path to method file 
+    method_file = st.text_input("4.Enter the directory path to the method file", "C:\Xcalibur\method\method1")
+    st.markdown(f"The method file for MS is from: <span style='color:red'>{method_file}</span>", unsafe_allow_html=True)
+
+    # Date of injection
+    date_injection = st.date_input("5.Date of injection", pd.Timestamp("today"))
+    # format date_injection to YYYYMMDD as text
+    date_injection = date_injection.strftime("%Y%m%d")
+    
+    
+    st.markdown(f"Date of injection: <span style='color:red'>{date_injection}</span>", unsafe_allow_html=True)
+    
+
+    # Download button
+    st.markdown("### Download data")
+    st.markdown("Click below to download the data.")
+    st.markdown(f"Download your data [here](data.csv)")
+        
 
 
 # Content for DDA
-with dda_tab:
-    st.header("DDA")
-    st.write("This is the content of the second tab.")
-    # Editable plot
-    df = pd.DataFrame({
-        'x': np.random.randn(100),
-        'y': np.random.randn(100)
-    })
-    fig = px.line(df, x='x', y='y', title="Editable Line Plot")
-    st.plotly_chart(fig)
+# with dda_tab:
+    # st.header("DDA")
+    # st.write("This is the content of the second tab.")
+    # # Editable plot
+    # df = pd.DataFrame({
+    #     'x': np.random.randn(100),
+    #     'y': np.random.randn(100)
+    # })
+    # fig = px.line(df, x='x', y='y', title="Editable Line Plot")
+    # st.plotly_chart(fig)
 
 # Content for Tab 3
-with srm_tab:
-    st.header("SRM or Targeted proteomics")
-    st.write("This is the content of the third tab.")
-    # Another interactive plot
-    df = pd.DataFrame({
-        'x': np.random.randn(100),
-        'y': np.random.randn(100)
-    })
-    fig = px.histogram(df, x='x', title="Interactive Histogram")
-    st.plotly_chart(fig)
+# with srm_tab:
+    # st.header("SRM or Targeted proteomics")
+    # st.write("This is the content of the third tab.")
+    # # Another interactive plot
+    # df = pd.DataFrame({
+    #     'x': np.random.randn(100),
+    #     'y': np.random.randn(100)
+    # })
+    # fig = px.histogram(df, x='x', title="Interactive Histogram")
+    # st.plotly_chart(fig)
 
