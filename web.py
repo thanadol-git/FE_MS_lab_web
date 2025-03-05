@@ -8,7 +8,7 @@ import plotly.express as px
 
 # Create a sidebar
 st.sidebar.header("Sample information")
-st.sidebar.write("This part is needed for every file that we are creating..")
+st.sidebar.write("This part is needed for every file that we are creating.")
 
 # Project
 proj_name = st.sidebar.text_input("Enter your project name", "Project X")
@@ -17,9 +17,11 @@ organism = st.sidebar.text_input("Select your organism", "Human")
 # Sample type
 sample = st.sidebar.text_input("Enter your sample", "Plasma")
 # Plate id 
-plate_id = st.sidebar.text_input("2.Enter your plate ID", "")
+plate_id = st.sidebar.text_input("Enter your plate ID", "")
 # Samplee/ cohort name
-sample_name = st.sidebar.text_input("1.Main cohort name/abbreviation", "Cohort_1")
+sample_name = st.sidebar.text_input("Main cohort name/abbreviation", "Cohort_1")
+# Acquisition technique 
+acq_tech = st.sidebar.selectbox("1.Select your acquisition", ["DDA", "DIA", "SRM"])
 
 
 
@@ -121,8 +123,6 @@ with plate_tab:
 with sample_order:
     st.header("DIA Injection")
     
-    # Acquisition technique 
-    acq_tech = st.selectbox("1.Select your acquisition", ["DDA", "DIA", "SRM"])
 
     # Choices Injection position with select boxes from red green and blue 
     injection_pos = st.selectbox("1.Select your injection position", ["Red", "Green", "Blue"])
