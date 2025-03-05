@@ -163,7 +163,7 @@ with dia_tab:
     plate_df_long['File Name'] = date_injection + "_" + proj_name + "_" + plate_id + "_" + plate_df_long['Position']
     plate_df_long['Position'] =  injection_pos_letter + plate_df_long['Position'] 
     
-    output_order_df = plate_df_long[['File name', 'Path', 'Instrument Method', 'Position','Inj Vol']]
+    output_order_df = plate_df_long[['File Name', 'Path', 'Instrument Method', 'Position','Inj Vol']]
     # Randomize row order
     output_order_df_rand = output_order_df.sample(frac=1).reset_index(drop=True)
     
