@@ -111,14 +111,22 @@ with plate_tab:
             ax.add_patch(plt.Circle((j + 0.5, i + 0.5), 0.4, color=color, fill=True))
             ax.text(j + 0.5, i + 0.5, f'{value}', ha='center', va='center', color='white', fontsize=4)
 
-    # Overlay ticks and labels
-    # ax.set_xticks(np.arange(len(plate_df.columns)) + 0.5)
-    # ax.set_yticks(np.arange(len(plate_df.index)) + 0.5)
-    # ax.set_xticklabels(plate_df.columns)
+
+    
+    
     ax.set_yticklabels(plate_df.index, rotation=0)
 
     st.pyplot(fig)
-
+    
+    # Histogram of the sample types from plate_df_long['Sample']
+    fig_samples = px.histogram(plate_df_long, x='Sample', title='Histogram of Sample types')
+    # Show count number in the middle of the bar and the color is white
+    fig_samples.update_traces(texttemplate='%{y}', textposition='inside', textfont_color
+                              ='white') 
+    st.plotly_chart(fig_samples)
+    
+    
+    
 # Content for DIA 
 with sample_order:
     st.header("DIA Injection")
