@@ -15,11 +15,15 @@ proj_name = st.sidebar.text_input("Enter your project name", "Project X")
 organism = st.sidebar.text_input("Select your organism", "Human")
 # Sample type
 sample = st.sidebar.text_input("Enter your sample", "Plasma")
+# Plate id 
+plate_id = st.sidebar.text_input("2.Enter your plate ID", "")
+# Samplee/ cohort name
+sample_name = st.sidebar.text_input("1.Main cohort name/abbreviation", "Cohort_1")
 
 
 
 # Create three tabs
-plate_tab, dia_tab, dda_tab, srm_tab = st.tabs(["Plate", "DIA", "DDA", "SRM"])
+plate_tab, dia_tab, dda_tab, srm_tab = st.tabs(["Plate Design", "DIA", "DDA", "SRM"])
 
 
 # content for Plate 
@@ -28,11 +32,9 @@ with plate_tab:
     
     # Sample types 
     st.subheader("A. Cohort name")
-    sample_name = st.text_input("1.Main cohort name/abbreviation", "Cohort_1")
     st.markdown(f"The main cohort samples will be: <span style='color:red'>{sample_name}</span>", unsafe_allow_html=True)
 
     # plate id 
-    plate_id = st.text_input("2.Enter your plate ID", "")
     if not plate_id:
         plate_id = sample_name
     st.markdown(f"Plate ID: <span style='color:red'>{plate_id}</span>", unsafe_allow_html=True)
@@ -116,7 +118,7 @@ with plate_tab:
 
 # Content for DIA 
 with dia_tab:
-    st.header("DIA")
+    st.header("DIA Injection")
 
     # Choices Injection position with select boxes from red green and blue 
     injection_pos = st.selectbox("1.Select your injection position", ["Red", "Green", "Blue"])
@@ -130,7 +132,6 @@ with dia_tab:
     injection_pos_letter = color_to_letter(injection_pos)
     st.write(f"The corresponding letter for {injection_pos} is {injection_pos_letter}")
 
-    
     # Injection volumes
     injection_vol = st.slider("2.Select your injection volume", 0.01, 0.1, 0.01, 0.01)
     st.markdown(f"Selected injection volume (ul): <span style='color:red'>{injection_vol}</span>", unsafe_allow_html=True)
@@ -158,32 +159,82 @@ with dia_tab:
     # Path column 
     plate_df_long['Path'] = uploaded_dir
     # File name 
-    plate_df_long['File name'] = date_injection + "_" + proj_name + "_" + plate_id + "_" + plate_df_long['Position']
+    plate_df_long['File Name'] = date_injection + "_" + proj_name + "_" + plate_id + "_" + plate_df_long['Position']
     plate_df_long['Position'] =  injection_pos_letter + plate_df_long['Position'] 
     
     output_order_df = plate_df_long[['File name', 'Path', 'Instrument Method', 'Position','Inj Vol']]
+    # Randomize row order
+    output_order_df_rand = output_order_df.sample(frac=1).reset_index(drop=True)
     
+    # QC standard and washes 
+    st.markdown("### Wash")
     
+    ## Wash parameters
+    wash_path = st.text_input("Enter the path to the washes", "C:\\data\\wash")
+    wash_method = st.text_input("Enter the method file for washes", "C:\\Xcalibur\\methods\\wash")
+    wash_pos = st.text_input("Enter the position for washes", "G3")
+    wash_df = pd.DataFrame({
+        "File Name": ['wash'],
+        "Path": [wash_path],
+        "Instrument Method": [wash_method],
+        "Position": [wash_pos],
+        "Inj Vol": [str(injection_vol)] 
+    })
+    # st.write(wash_df, index=False)
     
+    ## QC standard parameters
+    st.markdown("### QC Plasma standard")
+
+    qc_path = st.text_input("Enter the path to the QC standard", "C:\\data\\QC")
+    qc_method = st.text_input("Enter the method file for QC standard", "C:\\Xcalibur\\methods\\QC")
+    qc_pos = st.text_input("Enter the position for QC standard", "GE1")
+    # qc_vol = st.text_input("Enter the volume for QC standard", "0.01")
+    qc_df = pd.DataFrame({
+        "File Name": ['QC_Plasma'],
+        "Path": [qc_path],
+        "Instrument Method": [qc_method],
+        "Position": [qc_pos],
+        "Inj Vol": [str(injection_vol)]
+    })
     
+    # Bind row from wash_df before and after qc_df
+    qc_df = pd.concat([qc_df, wash_df], axis=0)
+    qc_df = qc_df.reset_index(drop=True)
     
-    # Download button
-    
-    
-    
-    
+    # st.write(qc_df, index=False )
+
+    # Download data
+
+    ## export order sampel name 
     sample_order_name = "_".join([proj_name, "Sample", "Order", plate_id]) + ".csv"
 
+    ## export order sample
+    # Bind row from wash_df after every 8 rows in output_order_df
+    chunks = [output_order_df_rand[i:i+8] for i in range(0, len(output_order_df_rand), 8)]
+    output_with_wash = pd.concat([pd.concat([chunk, wash_df], ignore_index=True) for chunk in chunks], ignore_index=True)
+    
+    # concat wash and qc dataframes
+    output_with_wash = pd.concat([wash_df, qc_df, output_with_wash, qc_df], ignore_index=True)
+    
+        # Convert DataFrame to CSV
+    csv_data = output_with_wash.to_csv(index=False)
+    
+    # Add 'Type=4,,,,' to the beginning of the CSV data
+    csv_data = 'Bracket Type=4,,,,\n' + csv_data
+    
+    # st.write(output_with_wash)
+    
+    ## Download button for export file
     st.markdown("### Download data")
-    st.markdown("The data below is the sample order for injection")
+    st.markdown("The data below is an example for sample order in Xcalibur. The injection order will be randomized and added with wash and qc standard.")
     st.write(output_order_df)
-    st.markdown("Click below to download the data.")
+    st.markdown("Click below to download the data.") 
     # Download button for output_order_df
     st.download_button(
         label="Download sample order",
-        data=output_order_df.to_csv(index=False),
+        data=csv_data,
         file_name=sample_order_name,
-        mime='text/csv'
+        mime='csv'
     )
         
 
