@@ -24,7 +24,7 @@ sample_name = st.sidebar.text_input("1.Main cohort name/abbreviation", "Cohort_1
 
 
 # Create three tabs
-plate_tab, sample_order, dda_tab, srm_tab = st.tabs(["Plate Design", "Sample Order"])
+plate_tab, sample_order = st.tabs(["Plate Design", "Sample Order"])
 
 
 # content for Plate 
