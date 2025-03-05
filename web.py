@@ -101,6 +101,8 @@ with plate_tab:
     ax.xaxis.tick_top()  # Move the x-axis labels to the top
     # fix label rotation on y to be straight
     ax.set_yticklabels(ax.get_yticklabels(), rotation=0)
+    # Add title on top 
+    ax.set_title(plate_id)
 
     # Plot the heatmap with discrete text colors
     sns.heatmap(plate_df.isnull(), cbar=False, cmap='magma', ax=ax, linewidths=0.5, linecolor='darkgrey', alpha = 0.0)
