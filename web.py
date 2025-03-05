@@ -9,10 +9,11 @@ import plotly.express as px
 st.sidebar.header("Sample information")
 st.sidebar.write("This part is needed for every file that we are creating..")
 
-# Inputs
-plate_name = st.sidebar.text_input("Enter your plate name", "Type Here")
+# Project
+proj_name = st.sidebar.text_input("Enter your project name", "Project X")
 # Organism
 organism = st.sidebar.text_input("Select your organism", "Human")
+# Sample type
 sample = st.sidebar.text_input("Enter your sample", "Plasma")
 
 
@@ -66,6 +67,13 @@ with plate_tab:
 
     
     st.write(plate_df)
+    
+    # format plate_df in a long for mat
+    plate_df_long = plate_df.stack().reset_index()
+    plate_df_long.columns = ['Row', 'Column', 'Sample']
+    
+    #Add Position column to plate_df_long
+
 
     # header 
     st.subheader("3. Layout of plate")
@@ -112,10 +120,19 @@ with dia_tab:
 
     # Choices Injection position with select boxes from red green and blue 
     injection_pos = st.selectbox("1.Select your injection position", ["Red", "Green", "Blue"])
+
     st.markdown(f"Selected injection position: <span style='color:red'>{injection_pos}</span>", unsafe_allow_html=True)
     
+    # Lambda function to check the color and return the corresponding letter
+    color_to_letter = lambda color: 'R' if color == 'Red' else 'B' if color == 'Blue' else 'G' if color == 'Green' else ''
+    
+    # Get the corresponding letter for the selected injection position
+    injection_pos_letter = color_to_letter(injection_pos)
+    st.write(f"The corresponding letter for {injection_pos} is {injection_pos_letter}")
+
+    
     # Injection volumes
-    injection_vol = st.slider("2.Select your injection volume", 0.01, 0.1, 0.05, 0.01)
+    injection_vol = st.slider("2.Select your injection volume", 0.01, 0.1, 0.01, 0.01)
     st.markdown(f"Selected injection volume (ul): <span style='color:red'>{injection_vol}</span>", unsafe_allow_html=True)
     
     # Path to the data
@@ -123,22 +140,51 @@ with dia_tab:
     st.markdown(f"The data will be saved at: <span style='color:red'>{uploaded_dir}</span>", unsafe_allow_html=True)
     
     # Path to method file 
-    method_file = st.text_input("4.Enter the directory path to the method file", "C:\Xcalibur\method\method1")
+    method_file = st.text_input("4.Enter the directory path to the method file", "C:\Xcalibur\methods\method1")
     st.markdown(f"The method file for MS is from: <span style='color:red'>{method_file}</span>", unsafe_allow_html=True)
 
     # Date of injection
     date_injection = st.date_input("5.Date of injection", pd.Timestamp("today"))
     # format date_injection to YYYYMMDD as text
     date_injection = date_injection.strftime("%Y%m%d")
-    
-    
     st.markdown(f"Date of injection: <span style='color:red'>{date_injection}</span>", unsafe_allow_html=True)
     
-
+    # Sample order column 
+    plate_df_long['Position'] =  plate_df_long['Row'] + plate_df_long['Column'].astype(str)
+    # Injection volume column
+    plate_df_long['Inj Vol'] = injection_vol
+    # Instrument method column
+    plate_df_long['Instrument Method'] = method_file
+    # Path column 
+    plate_df_long['Path'] = uploaded_dir
+    # File name 
+    plate_df_long['File name'] = date_injection + "_" + proj_name + "_" + plate_id + "_" + plate_df_long['Position']
+    plate_df_long['Position'] =  injection_pos_letter + plate_df_long['Position'] 
+    
+    output_order_df = plate_df_long[['File name', 'Path', 'Instrument Method', 'Position','Inj Vol']]
+    
+    
+    
+    
+    
     # Download button
+    
+    
+    
+    
+    sample_order_name = "_".join([proj_name, "Sample", "Order", plate_id]) + ".csv"
+
     st.markdown("### Download data")
+    st.markdown("The data below is the sample order for injection")
+    st.write(output_order_df)
     st.markdown("Click below to download the data.")
-    st.markdown(f"Download your data [here](data.csv)")
+    # Download button for output_order_df
+    st.download_button(
+        label="Download sample order",
+        data=output_order_df.to_csv(index=False),
+        file_name=sample_order_name,
+        mime='text/csv'
+    )
         
 
 
