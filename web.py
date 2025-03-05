@@ -21,7 +21,7 @@ plate_id = st.sidebar.text_input("Enter your plate ID", "")
 # Samplee/ cohort name
 sample_name = st.sidebar.text_input("Main cohort name/abbreviation", "Cohort_1")
 # Acquisition technique 
-acq_tech = st.sidebar.selectbox("1.Select your acquisition", ["DDA", "DIA", "SRM"])
+acq_tech = st.sidebar.selectbox("Select your acquisition", ["DDA", "DIA", "SRM"])
 
 
 
@@ -71,7 +71,7 @@ with plate_tab:
             plate_df.at[row, str(col + 1)] = text
 
     
-    st.write(plate_df)
+    # st.write(plate_df)
     
     # format plate_df in a long for mat
     plate_df_long = plate_df.stack().reset_index()
@@ -118,12 +118,16 @@ with plate_tab:
 
     st.pyplot(fig)
     
-    # Histogram of the sample types from plate_df_long['Sample']
-    fig_samples = px.histogram(plate_df_long, x='Sample', title='Histogram of Sample types')
-    # Show count number in the middle of the bar and the color is white
-    fig_samples.update_traces(texttemplate='%{y}', textposition='inside', textfont_color
-                              ='white') 
-    st.plotly_chart(fig_samples)
+    # Plot tree map from plate_df_long['Sample']
+    fig = px.treemap(plate_df_long, path=['Sample'], title='Plate layout')
+    # use the same color as heatmap previously
+    fig.update_traces(marker=dict(line=dict(width=2, color='DarkSlateGrey')))
+    
+    
+   
+    
+    st.plotly_chart(fig)
+    
     
     
     
