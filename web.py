@@ -227,9 +227,16 @@ with sample_order:
     sample_order_name = "_".join([proj_name, "Sample", "Order", plate_id]) + ".csv"
 
     ## export order sample
+    ### DIA/DDA plate
+    
     # Bind row from wash_df after every 8 rows in output_order_df
     chunks = [output_order_df_rand[i:i+8] for i in range(0, len(output_order_df_rand), 8)]
+    # Add wash and qc standard after every 8 rows
     output_with_wash = pd.concat([pd.concat([chunk, wash_df], ignore_index=True) for chunk in chunks], ignore_index=True)
+    
+    ### SRM plate
+    if acq_tech == "SRM":
+        output_with_wash = output_order_df_rand
     
     # concat wash and qc dataframes
     output_with_wash = pd.concat([wash_df, qc_df, output_with_wash, qc_df], ignore_index=True)
@@ -240,7 +247,11 @@ with sample_order:
     # Add 'Type=4,,,,' to the beginning of the CSV data
     csv_data = 'Bracket Type=4,,,,\n' + csv_data
     
-    # st.write(output_with_wash)
+    
+    
+
+        
+    st.write(csv_data)
     
     ## Download button for export file
     st.markdown("### Download data")
