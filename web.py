@@ -26,7 +26,7 @@ acq_tech = st.sidebar.selectbox("Select your acquisition", ["DDA", "DIA", "SRM"]
 
 
 # Create three tabs
-plate_tab, sample_order = st.tabs(["Plate Design", "Sample Order"])
+plate_tab, sample_order, sdrf_tab = st.tabs(["Plate Design", "Sample Order", "SDRF"])
 
 
 # content for Plate 
@@ -46,7 +46,7 @@ with plate_tab:
 
     st.subheader("2. Control or Pool")
     st.write("This is a list of control or pool.")
-    replace_pos = st.text_area("Example Control, Pool or another cohort", "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8").split('\n')
+    replace_pos = st.text_area("Example Control, Pool or another cohort", "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1").split('\n')
     # Write a  warning message if the position is mentioned more than one time in text area
     # Check if the position is mentioned more than one time
     pos_list = []
@@ -183,6 +183,9 @@ with sample_order:
     date_injection = date_injection.strftime("%Y%m%d")
     st.markdown(f"Date of injection: <span style='color:red'>{date_injection}</span>", unsafe_allow_html=True)
     
+    # Filter the plate_df_long to only include the samples
+    plate_df_long = plate_df_long[plate_df_long['Sample'] != 'EMPTY']
+    
     # Sample order column 
     plate_df_long['Position'] =  plate_df_long['Row'] + plate_df_long['Column'].astype(str)
     # Injection volume column
@@ -285,3 +288,59 @@ with sample_order:
     )
         
 
+with sdrf_tab:
+    st.header("SDRF")
+    
+    # Create a DataFrame for the SDRF
+    sdrf_df = pd.DataFrame({
+        # "source name": [f"{proj_name}_{sample_name}"],
+        # "characteristics[organism]": ["Homo sapiens"],
+        # "characteristics[organism part]": ["plasma"], 
+        # "characteristics[age]" : ["not available"], 
+        # "characteristics[developmental stage]" : ["not available"], 
+        # "characteristics[sex]" : ["not available"], ["not available"], 
+        # "characteristics[ancestry category]" : ["not available"], 
+        # "characteristics[cell type]" : ["not available"], 
+        # "characteristics[cell line]" : ["not available"], 
+        # "characteristics[disease]" : ["not available"], 
+        # "characteristics[individual]" : ["not available"], 
+        # "characteristics[biological replicate]" : ["1"]
+        # "material type" : ["plasma"],
+        "assay name" : [f"run {i}" for i in range(1, len(output_order_df["File Name"]) + 1)],
+        # "technology type" : ["proteomic profiling by mass spectrometry"]
+        "comment[data file]" : output_order_df["File Name"],
+        "comment[file uri]"	: output_order_df["File Name"] #,
+        # "comment[proteomics data acquisition method]" : ["NT=Data-Independent Acquisition;AC=NCIT:C161786"],
+        # "comment[fractionation method]"	: ["NT=High-performance liquid chromatography;AC=PRIDE:0000565"],
+        # "comment[fraction identifier]" :	["1"],
+        # "comment[label]" : ["AC=MS:1002038;NT=label free sample"],	
+        # "comment[technical replicate]" : ["1"],	
+        # "comment[cleavage agent details]" : ["NT=Trypsin;AC=MS:1001251"],	
+        # "comment[cleavage agent details]" : ["NT=Lys-C;AC=MS:1001309"],	
+        # "comment[ms2 mass analyzer]" : ["not available"], 	
+        # "comment[instrument]" : ["NT=Q Exactive HF;AC=MS:1002523"]
+        # "comment[modification parameters]" :	["not available"]
+        # "comment[dissociation method]" : ["AC=MS:1000422;NT=HCD"], 
+        # "comment[collision energy]" :	["27 NCE"],
+        # "comment[precursor mass tolerance]" :	["not available"]
+        # "comment[fragment mass tolerance]" : ["not available"]
+
+
+    })
+    
+    sdrf_df["fragment mass tolerance"] = "not available"
+    st.write(sdrf_df)
+    
+    # # Convert DataFrame to CSV
+    # csv_data = sdrf_df.to_csv(index=False)
+    
+    # # Add 'Type=4,,,,' to the beginning of the CSV data
+    # csv_data = 'Bracket Type=4,,,,\n' + csv_data
+    
+    # # Download button for SDRF
+    # st.markdown("Click below to download the SDRF data.") 
+    # st.download_button(
+    #     label="Download SDRF",
+    #     data=csv_data,
+    #     file_name=f"{proj_name}_SDRF.csv",
+    #     mime='csv'
