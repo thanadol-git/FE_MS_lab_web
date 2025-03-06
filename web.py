@@ -248,15 +248,10 @@ with sample_order:
     csv_data = 'Bracket Type=4,,,,\n' + csv_data
     
     
-    
-
-        
-    st.write(csv_data)
-    
     ## Download button for export file
     st.markdown("### Download data")
     
-    st.markdown("The data below is an example for sample order in Xcalibur. The injection order will be randomized and added with wash and qc standard.")
+    st.markdown("The data below is an example for sample order in Xcalibur. The injection order will be randomized and added with wash and qc standard. Be sure with SRM injection")
     st.write(output_order_df)
     st.markdown("Click below to download the data.") 
     # Download button for output_order_df
