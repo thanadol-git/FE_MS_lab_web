@@ -200,41 +200,48 @@ with sample_order:
     output_order_df_rand = output_order_df.sample(frac=1).reset_index(drop=True)
     
     # QC standard and washes 
-    st.markdown("### Wash")
+    cols = st.columns(2)
+    with cols[0]:
     
-    ## Wash parameters
-    wash_path = st.text_input("Enter the path to the washes", "C:\\data\\wash")
-    wash_method = st.text_input("Enter the method file for washes", "C:\\Xcalibur\\methods\\wash")
-    wash_pos = st.text_input("Enter the position for washes", "G3")
-    wash_df = pd.DataFrame({
-        "File Name": ['wash'],
-        "Path": [wash_path],
-        "Instrument Method": [wash_method],
-        "Position": [wash_pos],
-        "Inj Vol": [str(injection_vol)] 
-    })
-    # st.write(wash_df, index=False)
+        st.markdown("### Wash")
+        
+        ## Wash parameters
+        wash_path = st.text_input("Enter the path to the washes", "C:\\data\\wash")
+        wash_method = st.text_input("Enter the method file for washes", "C:\\Xcalibur\\methods\\wash")
+        wash_pos = st.text_input("Enter the position for washes", "G3")
+        wash_df = pd.DataFrame({
+            "File Name": ['wash'],
+            "Path": [wash_path],
+            "Instrument Method": [wash_method],
+            "Position": [wash_pos],
+            "Inj Vol": [str(injection_vol)] 
+        })
+        # st.write(wash_df, index=False)
     
-    ## QC standard parameters
-    st.markdown("### QC Plasma standard")
 
-    qc_path = st.text_input("Enter the path to the QC standard", "C:\\data\\QC")
-    qc_method = st.text_input("Enter the method file for QC standard", "C:\\Xcalibur\\methods\\QC")
-    qc_pos = st.text_input("Enter the position for QC standard", "GE1")
-    # qc_vol = st.text_input("Enter the volume for QC standard", "0.01")
-    qc_df = pd.DataFrame({
-        "File Name": ['QC_Plasma'],
-        "Path": [qc_path],
-        "Instrument Method": [qc_method],
-        "Position": [qc_pos],
-        "Inj Vol": [str(injection_vol)]
-    })
-    
-    # Bind row from wash_df before and after qc_df
-    qc_df = pd.concat([qc_df, wash_df], axis=0)
-    qc_df = qc_df.reset_index(drop=True)
-    
-    # st.write(qc_df, index=False )
+    with cols[1]:
+        ## QC standard parameters
+        st.markdown("### QC Plasma standard")
+
+        qc_path = st.text_input("Enter the path to the QC standard", "C:\\data\\QC")
+        qc_method = st.text_input("Enter the method file for QC standard", "C:\\Xcalibur\\methods\\QC")
+        qc_pos = st.text_input("Enter the position for QC standard", "GE1")
+        # qc_vol = st.text_input("Enter the volume for QC standard", "0.01")
+        qc_df = pd.DataFrame({
+            "File Name": ['QC_Plasma'],
+            "Path": [qc_path],
+            "Instrument Method": [qc_method],
+            "Position": [qc_pos],
+            "Inj Vol": [str(injection_vol)]
+        })
+        
+        # Bind row from wash_df before and after qc_df
+        qc_df = pd.concat([qc_df, wash_df], axis=0)
+        qc_df = qc_df.reset_index(drop=True)
+        
+        # st.write(qc_df, index=False )
+
+        
 
     # Download data
 
