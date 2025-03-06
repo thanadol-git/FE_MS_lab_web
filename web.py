@@ -151,7 +151,22 @@ with sample_order:
     st.write(f"The corresponding letter for {injection_pos} is {injection_pos_letter}")
 
     # Injection volumes
-    injection_vol = st.slider("2.Select your injection volume", 0.01, 5.0, 0.01, 0.01)
+    injection_vol = 0.1
+    
+    # Add suggestion volumn buttons     
+    button1, button2, button3, button4, button5 = st.columns(5)
+    if button1.button("0.01 ul", use_container_width=True):
+        injection_vol = 0.01
+    if button2.button("0.1 ul", use_container_width=True):
+        injection_vol = .1
+    if button3.button("5.0 ul", use_container_width=True):
+        injection_vol = 5.0
+    if button4.button("10.0 ul", use_container_width=True):
+        injection_vol = 10.0
+    if button5.button("15.0 ul", use_container_width=True):
+        injection_vol = 15.0
+    
+    injection_vol = st.slider("2.Select your injection volume", 0.01, 20.0, injection_vol, 0.01)
     st.markdown(f"Selected injection volume (ul): <span style='color:red'>{injection_vol}</span>", unsafe_allow_html=True)
     
     # Path to the data
