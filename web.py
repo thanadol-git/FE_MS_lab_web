@@ -328,7 +328,20 @@ with sdrf_tab:
 
     })
     
-    sdrf_df["fragment mass tolerance"] = "not available"
+    sdrf_df["comment[proteomics data acquisition method]"] = "T=Data-Independent Acquisition;AC=NCIT:C161786"
+    sdrf_df["comment[fractionation method]"] = "NT=High-performance liquid chromatography;AC=PRIDE:0000565"
+    sdrf_df["comment[fraction identifier]"] = "1"
+    sdrf_df["comment[label]"] = "AC=MS:1002038;NT=label free sample"
+    sdrf_df["comment[technical replicate]"] = "1"
+    # sdrf_df["comment[cleavage agent details]"] = "not available"
+    sdrf_df["comment[ms2 mass analyzer]"] = "NT=Trypsin;AC=MS:1001251"
+    sdrf_df["comment[instrument]"] = "not available"
+    sdrf_df["comment[modification parameters]"] = "not available"
+    sdrf_df["comment[dissociation method]"] = "AC=MS:1000422;NT=HCD"
+    sdrf_df["comment[collision energy]"] = "27 NCE"
+    sdrf_df["comment[precursor mass tolerance]"] = "not available"
+    sdrf_df["comment[fragment mass tolerance]"] = "not available"
+
     st.write(sdrf_df)
     
     # # Convert DataFrame to CSV
