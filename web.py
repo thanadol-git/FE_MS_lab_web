@@ -26,10 +26,18 @@ acq_tech = st.sidebar.selectbox("Select your acquisition", ["DDA", "DIA", "SRM"]
 
 
 # Create three tabs
-plate_tab, sample_order, sdrf_tab = st.tabs(["Plate Design", "Sample Order", "SDRF"])
+intro_tab, plate_tab, sample_order, sdrf_tab = st.tabs(["Intro", "Plate Design", "Sample Order", "SDRF"])
 
-
-# content for Plate 
+# content for intro
+with intro_tab:
+    st.header("Introduction")
+    st.write("This is a web application to help you design your plate layout and sample order for mass spectrometry.")
+    st.write("The application will help you design the plate layout, injection order, and SDRF file.")
+    st.write("Please fill in the necessary information in the sidebar to get started.")
+    
+    st.subheader("Related links")
+    st.markdown("1. [Xcalibur](https://www.thermofisher.com/order/catalog/product/OPTON-30900)")
+# content f)or Plate 
 with plate_tab:
     st.header("Plate layout")
     
@@ -165,9 +173,13 @@ with sample_order:
         injection_vol = 10.0
     if button5.button("15.0 ul", use_container_width=True):
         injection_vol = 15.0
-    
+    # manual volumn input
+    # injection_vol = st.text_input("Enter your injection volume (ul)", "0.1")
     injection_vol = st.slider("2.Select your injection volume", 0.01, 20.0, injection_vol, 0.01)
     st.markdown(f"Selected injection volume (ul): <span style='color:red'>{injection_vol}</span>", unsafe_allow_html=True)
+    
+
+    
     
     # Path to the data
     uploaded_dir = st.text_input("3.Enter the directory path to the data", "C:\data\yourdir")
