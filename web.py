@@ -345,7 +345,7 @@ with sdrf_tab:
     st.write(sdrf_df)
     
     # Add link to website github.com/thanadol-git/quantms_example/
-    url = "www.github.com/thanadol-git/quantms_example/"
+    url = "https://www.github.com/thanadol-git/quantms_example/"
     st.markdown("check out this [link](%s)" % url)
 
     # # Convert DataFrame to CSV
