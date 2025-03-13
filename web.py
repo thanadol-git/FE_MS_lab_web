@@ -23,6 +23,12 @@ sample_name = st.sidebar.text_input("Main cohort name/abbreviation", "Cohort_1")
 # Acquisition technique 
 acq_tech = st.sidebar.selectbox("Select your acquisition", ["DDA", "DIA", "SRM"])
 
+if 'SRM' in acq_tech: # If SRM  do 
+    srm_lot = st.sidebar.text_input('ProteomeEdge Lot number: Lot ', "23333")
+    if srm_lot: 
+        st.sidebar.markdown(f"The ProteomEdge Lot <span style='color:red'>{srm_lot}</span>", unsafe_allow_html=True)
+
+
 
 
 # Create three tabs
@@ -51,8 +57,7 @@ with plate_tab:
     st.markdown(f"Plate ID: <span style='color:red'>{plate_id}</span>", unsafe_allow_html=True)
 
 
-
-    st.subheader("2. Control or Pool")
+    st.subheader("B. Control or Pool")
     st.write("This is a list of control or pool. Important! The 'EMPTY' will be removed in the later steps.")
     replace_pos = st.text_area("Example Control, Pool or another cohort", "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1").split('\n')
     # Write a  warning message if the position is mentioned more than one time in text area
