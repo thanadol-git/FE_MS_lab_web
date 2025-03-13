@@ -219,19 +219,21 @@ with sample_order:
     # QC standard and washes 
     cols = st.columns(2)
     with cols[0]:
-    
+        
         st.markdown("### Wash")
         
         ## Wash parameters
         wash_path = st.text_input("Enter the path to the washes", "C:\\data\\wash")
         wash_method = st.text_input("Enter the method file for washes", "C:\\Xcalibur\\methods\\wash")
         wash_pos = st.text_input("Enter the position for washes", "G3")
+        injection_vol_wash = st.text_input("Modify your 'Wash' injection volume (ul)", str(injection_vol))
+
         wash_df = pd.DataFrame({
             "File Name": ['wash'],
             "Path": [wash_path],
             "Instrument Method": [wash_method],
             "Position": [wash_pos],
-            "Inj Vol": [str(injection_vol)] 
+            "Inj Vol": [injection_vol_wash] 
         })
         # st.write(wash_df, index=False)
     
@@ -243,13 +245,15 @@ with sample_order:
         qc_path = st.text_input("Enter the path to the QC standard", "C:\\data\\QC")
         qc_method = st.text_input("Enter the method file for QC standard", "C:\\Xcalibur\\methods\\QC")
         qc_pos = st.text_input("Enter the position for QC standard", "GE1")
+        injection_vol_qc = st.text_input("Modify your 'QC' injection volume (ul)", str(injection_vol))
+
         # qc_vol = st.text_input("Enter the volume for QC standard", "0.01")
         qc_df = pd.DataFrame({
             "File Name": ['QC_Plasma'],
             "Path": [qc_path],
             "Instrument Method": [qc_method],
             "Position": [qc_pos],
-            "Inj Vol": [str(injection_vol)]
+            "Inj Vol": [injection_vol_qc]
         })
         
         # Bind row from wash_df before and after qc_df
