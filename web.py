@@ -165,22 +165,26 @@ with sample_order:
 
     # Injection volumes
     injection_vol = 0.1
-    
-    # Add suggestion volumn buttons     
-    button1, button2, button3, button4, button5 = st.columns(5)
-    if button1.button("0.01 ul", use_container_width=True):
-        injection_vol = 0.01
-    if button2.button("0.1 ul", use_container_width=True):
-        injection_vol = .1
-    if button3.button("5.0 ul", use_container_width=True):
-        injection_vol = 5.0
-    if button4.button("10.0 ul", use_container_width=True):
-        injection_vol = 10.0
-    if button5.button("15.0 ul", use_container_width=True):
-        injection_vol = 15.0
-    # manual volumn input
-    # injection_vol = st.text_input("Enter your injection volume (ul)", "0.1")
+
     injection_vol = st.slider("2.Select your injection volume", 0.01, 20.0, injection_vol, 0.01)
+    cols = st.columns(2)
+    with cols[0]:
+        # Add suggestion volumn buttons     
+        button1, button2, button3, button4, button5 = st.columns(5)
+        if button1.button("0.01 ul", use_container_width=True):
+            injection_vol = 0.01
+        if button2.button("0.1 ul", use_container_width=True):
+            injection_vol = .1
+        if button3.button("5.0 ul", use_container_width=True):
+            injection_vol = 5.0
+        if button4.button("10.0 ul", use_container_width=True):
+            injection_vol = 10.0
+        if button5.button("15.0 ul", use_container_width=True):
+            injection_vol = 15.0
+    with cols[1]:
+        injection_vol = st.text_input("Enter your injection volume (ul)", str(injection_vol))
+    
+    
     st.markdown(f"Selected injection volume (ul): <span style='color:red'>{injection_vol}</span>", unsafe_allow_html=True)
     
 
