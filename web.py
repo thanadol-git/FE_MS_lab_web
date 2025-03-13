@@ -53,7 +53,7 @@ with plate_tab:
 
 
     st.subheader("2. Control or Pool")
-    st.write("This is a list of control or pool.")
+    st.write("This is a list of control or pool. Important! The 'EMPTY' will be removed in the later steps.")
     replace_pos = st.text_area("Example Control, Pool or another cohort", "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1").split('\n')
     # Write a  warning message if the position is mentioned more than one time in text area
     # Check if the position is mentioned more than one time
@@ -211,6 +211,8 @@ with sample_order:
     plate_df_long['Position'] =  injection_pos_letter + plate_df_long['Position'] 
     
     output_order_df = plate_df_long[['File Name', 'Path', 'Instrument Method', 'Position','Inj Vol']]
+    # Remove 'EMPTY' wells from the output_order_df
+    output_order_df = output_order_df[output_order_df['Position'] != 'EMPTY']
     # Randomize row order
     output_order_df_rand = output_order_df.sample(frac=1).reset_index(drop=True)
     
