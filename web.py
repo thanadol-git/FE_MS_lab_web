@@ -143,7 +143,7 @@ with plate_tab:
     
 # Content for DIA 
 with sample_order:
-    st.header("DIA Injection")
+    st.header(acq_tech + " Injection")
     
 
     # Choices Injection position with select boxes from red green and blue 
