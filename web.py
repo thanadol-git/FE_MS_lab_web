@@ -94,7 +94,7 @@ with plate_tab:
 
 
     # header 
-    st.subheader("3. Layout of plate")
+    st.subheader("C. Layout of plate")
     
     
     
