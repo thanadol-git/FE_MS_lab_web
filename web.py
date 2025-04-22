@@ -152,7 +152,7 @@ with sample_order:
     
 
     # Choices Injection position with select boxes from red green and blue 
-    injection_pos = st.selectbox("1.Select your injection position", ["Red", "Green", "Blue"])
+    injection_pos = st.selectbox("1.Select your Autosampler injection position", ["Red", "Green", "Blue"])
 
     st.markdown(f"Selected injection position: <span style='color:red'>{injection_pos}</span>", unsafe_allow_html=True)
     
