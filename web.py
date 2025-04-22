@@ -24,7 +24,7 @@ sample_name = st.sidebar.text_input("Main cohort name/abbreviation", "Cohort_1")
 acq_tech = st.sidebar.selectbox("Select your acquisition", ["DDA", "DIA", "SRM"])
 
 if 'SRM' in acq_tech: # If SRM  do 
-    srm_lot = st.sidebar.text_input('ProteomeEdge Lot number: Lot ', "23333")
+    srm_lot = st.sidebar.text_input('ProteomeEdge Lot number: Lot ', "23233")
     if srm_lot: 
         st.sidebar.markdown(f"The ProteomEdge Lot <span style='color:red'>{srm_lot}</span>", unsafe_allow_html=True)
 
