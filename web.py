@@ -59,7 +59,7 @@ with plate_tab:
 
     st.subheader("B. Control or Pool")
     st.write("This is a list of control or pool. Important! The 'EMPTY' will be removed in the later steps.")
-    replace_pos = st.text_area("Example Control, Pool or another cohort", "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1").split('\n')
+    replace_pos = st.text_area("Example Control, Pool or another cohort", "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1\nCohort_1;RowA").split('\n')
     # Write a  warning message if the position is mentioned more than one time in text area
     # Check if the position is mentioned more than one time
     pos_list = []
