@@ -59,7 +59,30 @@ with plate_tab:
 
     st.subheader("B. Control or Pool")
     st.write("This is a list of control or pool. Important! The 'EMPTY' will be removed in the later steps.")
-    replace_pos = st.text_area("Example Control, Pool or another cohort", "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1\nCohort_1;RowA").split('\n')
+    replace_pos = st.text_area("Example Control, Pool or another cohort", "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1\nCohort_3;ColD").split('\n')
+    
+    
+    # Filter row in text that contain 'Col' or 'Row' in replace_pos
+    colrow_label = [item for item in replace_pos if ('Col' in item or 'Row' in item)]
+    
+    
+
+    
+    # Check if the text that contains Col is followed by a number 1-12 and for 'Row' is followed by a letter A-H
+    valid_replace_pos = []
+    for item in replace_pos:
+        if ';' in item:
+            text, pos = item.split(';')
+            # Check if pos is valid
+            if len(pos) > 1 and pos[0] in 'ABCDEFGH' and pos[1:].isdigit() and 1 <= int(pos[1:]) <= 12:
+                valid_replace_pos.append(item)
+            else:
+                st.warning(f"Invalid position format: {item}. It should be like 'Cohort_2;C8'.")
+        else:
+            st.warning(f"Invalid format: {item}. It should be like 'Cohort_2;Col8'.")
+    
+    # Remove row with 'Col' or 'Row in replace_pos
+    replace_pos = [item for item in replace_pos if not ('Col' in item or 'Row' in item)]
     # Write a  warning message if the position is mentioned more than one time in text area
     # Check if the position is mentioned more than one time
     pos_list = []
@@ -84,7 +107,7 @@ with plate_tab:
             plate_df.at[row, str(col + 1)] = text
 
     
-    # st.write(plate_df)
+    st.write(colrow_label)
     
     # format plate_df in a long for mat
     plate_df_long = plate_df.stack().reset_index()
