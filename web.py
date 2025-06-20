@@ -391,8 +391,8 @@ with sdrf_tab:
 
     })
     # Create empty pandas DataFrame 
-    comment_df = pd.DataFrame(columns=[
-        "source name",
+    # comment_df = pd.DataFrame(columns=[
+    #     "source name",
     sdrf_df["comment[proteomics data acquisition method]"] = "T=Data-Independent Acquisition;AC=NCIT:C161786"
     sdrf_df["comment[fractionation method]"] = "NT=High-performance liquid chromatography;AC=PRIDE:0000565"
     sdrf_df["comment[fraction identifier]"] = "1"
