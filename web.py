@@ -186,7 +186,11 @@ with sample_order:
     # Choices Injection position with select boxes from red green and blue 
     injection_pos = st.selectbox("1.Select your Autosampler injection position", ["Red", "Green", "Blue"])
 
-    st.markdown(f"Selected injection position: <span style='color:red'>{injection_pos}</span>", unsafe_allow_html=True)
+    # Determine the color based on the injection position
+    load_color = 'red' if injection_pos == 'Red' else 'green' if injection_pos == 'Green' else 'blue'
+
+    # Display the injection position with the corresponding color
+    st.markdown(f"Selected injection position: <span style='color:{load_color}'>{injection_pos}</span>", unsafe_allow_html=True)
     
     # Lambda function to check the color and return the corresponding letter
     color_to_letter = lambda color: 'R' if color == 'Red' else 'B' if color == 'Blue' else 'G' if color == 'Green' else ''
@@ -386,7 +390,9 @@ with sdrf_tab:
 
 
     })
-    
+    # Create empty pandas DataFrame 
+    comment_df = pd.DataFrame(columns=[
+        "source name",
     sdrf_df["comment[proteomics data acquisition method]"] = "T=Data-Independent Acquisition;AC=NCIT:C161786"
     sdrf_df["comment[fractionation method]"] = "NT=High-performance liquid chromatography;AC=PRIDE:0000565"
     sdrf_df["comment[fraction identifier]"] = "1"
