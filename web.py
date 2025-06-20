@@ -160,8 +160,8 @@ with plate_tab:
         order=plate_df_long['Sample'].value_counts().index,  # Reorder by count
         palette=custom_palette  # Apply the custom palette
     )
-    ax2.set_title("Sample count in plate")
-    ax2.set_xlabel("Sample")
+    ax2.set_title(f"Sample count in plate {plate_id}")
+    ax2.set_xlabel(None)
     ax2.set_ylabel("Count")
 
     # Add count numbers on top of the bars
