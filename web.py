@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from datetime import datetime
 import plotly.express as px
 
 
@@ -299,7 +300,7 @@ with sample_order:
     # Download data
 
     ## export order sampel name 
-    sample_order_name = "_".join([proj_name, "Sample", "Order", plate_id]) + ".csv"
+    sample_order_name = "_".join([datetime.now().strftime("%Y%m%d%H%M"), proj_name, "Sample", "Order", plate_id]) + ".csv"
 
     ## export order sample
     ### DIA/DDA plate
