@@ -60,7 +60,7 @@ with plate_tab:
 
     st.subheader("B. Control or Pool")
     st.write("This is a list of control or pool. Important! The 'EMPTY' will be removed in the later steps.")
-    replace_pos = st.text_area("Example Control, Pool or another cohort", "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1\nCohort_2;RowD\nCohort_2;Col10").split('\n')
+    replace_pos = st.text_area("Example Control, Pool or another cohort", "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1\nCohort_2;RowD\nCohort_2;RowE\nCohort_2;Col9\nCohort_2;Col8").split('\n')
     # Filter row in text that contain 'Col' or 'Row' in replace_pos
     colrow_label = [item for item in replace_pos if ('Col' in item or 'Row' in item)]
         # Remove row with 'Col' or 'Row in replace_pos
