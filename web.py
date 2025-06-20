@@ -21,10 +21,19 @@ sample = st.sidebar.text_input("Enter your sample", "Plasma")
 plate_id = st.sidebar.text_input("Enter your plate ID", "")
 # Samplee/ cohort name
 sample_name = st.sidebar.text_input("Main cohort name/abbreviation", "Cohort_1")
+# Instrument
+machine = st.sidebar.selectbox("Select your instrument", ["Q Exactive HF", "TSQ Altis", "LIT Stellar"])
 # Acquisition technique 
 acq_tech = st.sidebar.selectbox("Select your acquisition", ["DDA", "DIA", "SRM"])
-
+# if machine == "Q Exactive HF":
+#     acq_tech = "DIA"
+# elif machine == "TSQ Altis":
+#     acq_tech = "SRM"
+# else:
+#     acq_tech = "DIA"
+    
 if 'SRM' in acq_tech: # If SRM  do 
+    # acq_tech = "SRM"
     srm_lot = st.sidebar.text_input('ProteomeEdge Lot number: Lot ', "23233")
     if srm_lot: 
         st.sidebar.markdown(f"The ProteomEdge Lot <span style='color:red'>{srm_lot}</span>", unsafe_allow_html=True)
@@ -353,6 +362,9 @@ with sample_order:
 
 with sdrf_tab:
     st.header("SDRF")
+    ms_file = st.selectbox("MS file output", ["RAW", "mzML"])
+
+    # CE = st.markup("Collision Energy (CE) is set to 27 NCE. If you want to change it, please edit the code in the web.py file.")
     
     # Create a DataFrame for the SDRF
     sdrf_df = pd.DataFrame({
@@ -369,10 +381,10 @@ with sdrf_tab:
         # "characteristics[individual]" : ["not available"], 
         # "characteristics[biological replicate]" : ["1"]
         # "material type" : ["plasma"],
-        "assay name" : [f"run {i}" for i in range(1, len(output_order_df["File Name"]) + 1)],
+        "assay name" : [f"run {i}" for i in range(1, output_order_df.shape[0] + 1)],
         # "technology type" : ["proteomic profiling by mass spectrometry"]
-        "comment[data file]" : output_order_df["File Name"],
-        "comment[file uri]"	: output_order_df["File Name"] #,
+        "comment[data file]" : output_order_df["File Name"]+ "." + ms_file,
+        "comment[file uri]"	: output_order_df["File Name"] + "." + ms_file #,
         # "comment[proteomics data acquisition method]" : ["NT=Data-Independent Acquisition;AC=NCIT:C161786"],
         # "comment[fractionation method]"	: ["NT=High-performance liquid chromatography;AC=PRIDE:0000565"],
         # "comment[fraction identifier]" :	["1"],
