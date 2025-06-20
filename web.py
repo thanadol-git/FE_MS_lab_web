@@ -168,7 +168,7 @@ with plate_tab:
     for p in ax2.patches:
         ax2.text(
             p.get_x() + p.get_width() / 2.,  # X-coordinate (center of the bar)
-            p.get_height() + 0.5,           # Y-coordinate (slightly above the bar)
+            p.get_height() + 1,           # Y-coordinate (slightly above the bar)
             int(p.get_height()),            # Text (bar height)
             ha='center', va='center', fontsize=10, color='black'  # Text alignment and styling
         )
