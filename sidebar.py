@@ -17,15 +17,15 @@ def create_sidebar():
     sample_name = st.sidebar.text_input("Main cohort name/abbreviation", "Cohort_1")
     # Instrument
     machine = st.sidebar.selectbox("Select your instrument", ["Q Exactive HF", "TSQ Altis", "LIT Stellar"])
+    ms_options = {
+        "Q Exactive HF": ["DIA", "DDA","PRM"],
+        "TSQ Altis": ["SRM"],
+        "LIT Stellar": ["DIA", "DDA", "PRM", "SRM"]
+    }
     # Acquisition technique 
-    acq_tech = st.sidebar.selectbox("Select your acquisition", ["DDA", "DIA", "SRM"])
-    # if machine == "Q Exactive HF":
-    #     acq_tech = "DIA"
-    # elif machine == "TSQ Altis":
-    #     acq_tech = "SRM"
-    # else:
-    #     acq_tech = "DIA"
-        
+    acq_tech = st.sidebar.selectbox("Select your acquisition",ms_options[machine])
+
+    # Add SRM/Proteomedge panel
     if 'SRM' in acq_tech: # If SRM  do 
         # acq_tech = "SRM"
         srm_lot = st.sidebar.text_input('ProteomeEdge Lot number: Lot ', "23233")
