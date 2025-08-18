@@ -22,22 +22,89 @@ intro_tab, plate_tab, sample_order, sdrf_tab = st.tabs(["Intro", "Plate Design",
 with intro_tab:
     intro_detail()
 
+
+def create_plate_df_long(plate_df): 
+    long_format = plate_df.stack().reset_index()
+    long_format.columns = ['Row', 'Column', 'Sample']
+    return long_format
+
+def plate_dfplot(plate_df, plate_id): 
+    
+    # format plate_df in a long format
+    plate_df_long = create_plate_df_long(plate_df)
+    
+    # Get unique labels sorted alphabetically
+    unique_labels = sorted(plate_df_long['Sample'].unique())
+
+    # Create a custom palette with colors mapped to labels alphabetically
+    custom_palette = dict(zip(unique_labels, sns.color_palette("colorblind", len(unique_labels))))
+
+    
+    fig, ax = plt.subplots()
+    # Create a color palette for discrete text
+
+    # Plot the heatmap with discrete text colors
+    sns.heatmap(plate_df.isnull(), cbar=False, cmap="coolwarm", ax=ax, linewidths=1, linecolor='darkgrey', alpha=0.1)
+    ax.xaxis.tick_top()  # Move the x-axis labels to the top
+    ax.set_yticklabels(ax.get_yticklabels(), rotation=0)  # Fix label rotation on y-axis
+    ax.set_title(plate_id)  # Add title on top
+
+    # Add text annotations and circles with custom colors
+    for i in range(plate_df.shape[0]):
+        for j in range(plate_df.shape[1]):
+            value = plate_df.iloc[i, j]
+            color = custom_palette.get(value, (1, 1, 1))  # Use custom_palette for colors
+            ax.add_patch(plt.Circle((j + 0.5, i + 0.5), 0.4, color=color, fill=True))
+            ax.text(j + 0.5, i + 0.5, f'{value}', ha='center', va='center', color='white', fontsize=4)
+
+    ax.set_yticklabels(plate_df.index, rotation=0)
+
+    # Display the plot
+    st.pyplot(fig)
+    
+    # Plot barplot from labels of plate_df_long['Sample']
+    fig2, ax2 = plt.subplots()
+    sns.countplot(
+        data=plate_df_long, 
+        x='Sample', 
+        ax=ax2, 
+        order=plate_df_long['Sample'].value_counts().index,  # Reorder by count
+        palette=custom_palette  # Apply the custom palette
+    )
+    ax2.set_title(f"Sample count in plate {plate_id}")
+    ax2.set_xlabel(None)
+    ax2.set_ylabel("Count")
+
+    # Add count numbers on top of the bars
+    for p in ax2.patches:
+        ax2.text(
+            p.get_x() + p.get_width() / 2.,  # X-coordinate (center of the bar)
+            p.get_height() + 1,           # Y-coordinate (slightly above the bar)
+            int(p.get_height()),            # Text (bar height)
+            ha='center', va='center', fontsize=10, color='black'  # Text alignment and styling
+        )
+
+    # Display the plot
+    st.pyplot(fig2)
+    
+    # Return the plate_df_long for use in other parts
+    return plate_df_long
+
 with plate_tab:
     st.header("Plate layout new")
     
     # Sample types 
     st.subheader("A. Cohort name")
+    
     st.markdown(f"The main cohort samples will be: <span style='color:red'>{sample_name}</span>", unsafe_allow_html=True)
-
-    # plate id 
-    if not plate_id:
-        plate_id = sample_name
     st.markdown(f"Plate ID: <span style='color:red'>{plate_id}</span>", unsafe_allow_html=True)
 
-
+    # Adding pool or control
     st.subheader("B. Control or Pool")
     st.write("This is a list of control or pool. Important! The 'EMPTY' will be removed in the later steps.")
-    replace_pos = st.text_area("Example Control, Pool or another cohort", "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1\nCohort_2;RowD\nCohort_2;RowE\nCohort_2;Col9\nCohort_2;Col8").split('\n')
+    
+    example_text = "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1\nCohort_2;RowD\nCohort_2;RowE\nCohort_2;Col9\nCohort_2;Col8"
+    replace_pos = st.text_area("Example Control, Pool or another cohort", example_text).split('\n')
     # Filter row in text that contain 'Col' or 'Row' in replace_pos
     colrow_label = [item for item in replace_pos if ('Col' in item or 'Row' in item)]
         # Remove row with 'Col' or 'Row in replace_pos
@@ -87,77 +154,27 @@ with plate_tab:
     ## Comments for checking
     # st.write(replace_pos)
     
-    # format plate_df in a long for mat
-    plate_df_long = plate_df.stack().reset_index()
-    plate_df_long.columns = ['Row', 'Column', 'Sample']
-    
-        # Get unique labels sorted alphabetically
-    unique_labels = sorted(plate_df_long['Sample'].unique())
-
-    # Create a custom palette with colors mapped to labels alphabetically
-    custom_palette = dict(zip(unique_labels, sns.color_palette("colorblind", len(unique_labels))))
 
         
     # header 
     st.subheader("C. Layout of plate")
+    plate_df_long = plate_dfplot(plate_df, plate_id)
     
-    
-    
-    # Heatmap of plate location 
-    # from plate_df to heatmap
-    fig, ax = plt.subplots()
-    # Create a color palette for discrete text
+    # Store in session state for use in other tabs
+    st.session_state.plate_df_long = plate_df_long
 
-
-    # Plot the heatmap with discrete text colors
-    sns.heatmap(plate_df.isnull(), cbar=False, cmap="coolwarm", ax=ax, linewidths=1, linecolor='darkgrey', alpha=0.1)
-    ax.xaxis.tick_top()  # Move the x-axis labels to the top
-    ax.set_yticklabels(ax.get_yticklabels(), rotation=0)  # Fix label rotation on y-axis
-    ax.set_title(plate_id)  # Add title on top
-
-    # Add text annotations and circles with custom colors
-    for i in range(plate_df.shape[0]):
-        for j in range(plate_df.shape[1]):
-            value = plate_df.iloc[i, j]
-            color = custom_palette.get(value, (1, 1, 1))  # Use custom_palette for colors
-            ax.add_patch(plt.Circle((j + 0.5, i + 0.5), 0.4, color=color, fill=True))
-            ax.text(j + 0.5, i + 0.5, f'{value}', ha='center', va='center', color='white', fontsize=4)
-
-    ax.set_yticklabels(plate_df.index, rotation=0)
-
-    # Display the plot
-    st.pyplot(fig)
-    
-    # Plot barplot from labels of plate_df_long['Sample']
-    fig2, ax2 = plt.subplots()
-    sns.countplot(
-        data=plate_df_long, 
-        x='Sample', 
-        ax=ax2, 
-        order=plate_df_long['Sample'].value_counts().index,  # Reorder by count
-        palette=custom_palette  # Apply the custom palette
-    )
-    ax2.set_title(f"Sample count in plate {plate_id}")
-    ax2.set_xlabel(None)
-    ax2.set_ylabel("Count")
-
-    # Add count numbers on top of the bars
-    for p in ax2.patches:
-        ax2.text(
-            p.get_x() + p.get_width() / 2.,  # X-coordinate (center of the bar)
-            p.get_height() + 1,           # Y-coordinate (slightly above the bar)
-            int(p.get_height()),            # Text (bar height)
-            ha='center', va='center', fontsize=10, color='black'  # Text alignment and styling
-        )
-
-    # Display the plot
-    st.pyplot(fig2)
-
-
-# Content for DIA
 with sample_order:
     st.header(acq_tech + " Injection")
     
+    # Get plate_df_long from session state
+    if 'plate_df_long' in st.session_state:
+        plate_df_long = st.session_state.plate_df_long.copy()
+    else:
+        st.warning("Please go to the 'Plate Design' tab first to create the plate layout.")
+        st.stop()
+    
+    # Filter the plate_df_long to only include the samples
+    plate_df_long = plate_df_long[plate_df_long['Sample'] != 'EMPTY']
 
     # Choices Injection position with select boxes from red green and blue 
     injection_pos = st.selectbox("1.Select your Autosampler injection position", ["Red", "Green", "Blue"])
@@ -199,9 +216,6 @@ with sample_order:
     
     st.markdown(f"Selected injection volume (ul): <span style='color:red'>{injection_vol}</span>", unsafe_allow_html=True)
     
-
-    
-    
     # Path to the data
     uploaded_dir = st.text_input("3.Enter the directory path to the data", "C:\data\yourdir")
     st.markdown(f"The data will be saved at: <span style='color:red'>{uploaded_dir}</span>", unsafe_allow_html=True)
@@ -215,9 +229,6 @@ with sample_order:
     # format date_injection to YYYYMMDD as text
     date_injection = date_injection.strftime("%Y%m%d")
     st.markdown(f"Date of injection: <span style='color:red'>{date_injection}</span>", unsafe_allow_html=True)
-    
-    # Filter the plate_df_long to only include the samples
-    plate_df_long = plate_df_long[plate_df_long['Sample'] != 'EMPTY']
     
     # Sample order column 
     plate_df_long['Position'] =  plate_df_long['Row'] + plate_df_long['Column'].astype(str)
@@ -305,7 +316,10 @@ with sample_order:
     # concat wash and qc dataframes
     output_with_wash = pd.concat([wash_df, qc_df, output_with_wash, qc_df], ignore_index=True)
     
-        # Convert DataFrame to CSV
+    # Store output_order_df in session state for SDRF tab
+    st.session_state.output_order_df = output_order_df
+    
+    # Convert DataFrame to CSV
     csv_data = output_with_wash.to_csv(index=False)
     
     # Add 'Type=4,,,,' to the beginning of the CSV data
@@ -330,6 +344,13 @@ with sample_order:
 with sdrf_tab:
     st.header("SDRF")
     ms_file = st.selectbox("MS file output", ["RAW", "mzML"])
+
+    # Get output_order_df from session state
+    if 'output_order_df' in st.session_state:
+        output_order_df = st.session_state.output_order_df
+    else:
+        st.warning("Please go to the 'Sample Order' tab first to create the sample order.")
+        st.stop()
 
     # CE = st.markup("Collision Energy (CE) is set to 27 NCE. If you want to change it, please edit the code in the web.py file.")
     
