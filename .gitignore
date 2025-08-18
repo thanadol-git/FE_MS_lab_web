@@ -1,5 +1,6 @@
 # Folders 
 data
 env
+__pycache__
 
 # Files
