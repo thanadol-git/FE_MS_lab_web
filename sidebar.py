@@ -15,6 +15,10 @@ def create_sidebar():
     plate_id = st.sidebar.text_input("Enter your plate ID", "")
     # Samplee/ cohort name
     sample_name = st.sidebar.text_input("Main cohort name/abbreviation", "Cohort_1")
+    
+    # MS content
+    st.sidebar.header("MS setup")
+    
     # Instrument
     machine = st.sidebar.selectbox("Select your instrument", ["Q Exactive HF", "TSQ Altis", "LIT Stellar"])
     ms_options = {
@@ -22,9 +26,6 @@ def create_sidebar():
         "TSQ Altis": ["SRM"],
         "LIT Stellar": ["DIA", "DDA", "PRM", "SRM"]
     }
-    # MS content
-    st.sidebar.header("MS setup")
-    
     # Acquisition technique 
     acq_tech = st.sidebar.selectbox("Select your acquisition",ms_options[machine])
 
