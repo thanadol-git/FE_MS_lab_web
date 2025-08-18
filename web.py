@@ -10,7 +10,7 @@ import plotly.express as px
 from sidebar import create_sidebar
 from tabs.intro_tab import intro_detail
 # from tabs.plate_tab import plate_design_tab
-
+# from tabs.sdrf_tab import sdrf_tab
 
 # Sidebar
 proj_name, organism, sample, plate_id, sample_name, machine, acq_tech = create_sidebar()
