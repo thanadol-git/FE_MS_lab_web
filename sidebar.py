@@ -61,12 +61,13 @@ def ms_info():
         "Chymotrypsin": "NT=Chymotrypsin;AC=MS:1001306"
     }
     
+    # Dissociation
+    dissociation_method = st.sidebar.selectbox("Select your dissociation method", ["ETD", "CID", "HCD"])
     # Get the accession list for selected enzymes
-    sdrf_enz = [enz_accession.get(enzyme, f"NT={enzyme};AC=unknown") for enzyme in digestion_enz]
+    # sdrf_enz = [enz_accession.get(enzyme, f"NT={enzyme};AC=unknown") for enzyme in digestion_enz]
 
-    st.sidebar.write("You selected:", digestion_enz)
 
-    return machine, acq_tech, srm_lot, sdrf_ms, sdrf_enz
+    return machine, acq_tech, srm_lot, sdrf_ms#, #sdrf_enz
 
 def create_sidebar():
     # Create a sidebar
@@ -78,6 +79,6 @@ def create_sidebar():
     # MS content
     st.sidebar.header("MS setup")
 
-    machine, acq_tech, srm_lot, sdrf_ms, sdrf_enz = ms_info()
+    machine, acq_tech, srm_lot, sdrf_ms = ms_info()
 
     return proj_name, organism, sample, plate_id, sample_name, machine, acq_tech
