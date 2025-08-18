@@ -181,18 +181,16 @@ with sample_order:
 
     # Determine the color based on the injection position
     load_color = 'red' if injection_pos == 'Red' else 'green' if injection_pos == 'Green' else 'blue'
-
-    # Display the injection position with the corresponding color
-    st.markdown(f"Selected injection position: <span style='color:{load_color}'>{injection_pos}</span>", unsafe_allow_html=True)
     
     # Lambda function to check the color and return the corresponding letter
     color_to_letter = lambda color: 'R' if color == 'Red' else 'B' if color == 'Blue' else 'G' if color == 'Green' else ''
     
     # Get the corresponding letter for the selected injection position
     injection_pos_letter = color_to_letter(injection_pos)
-    st.write(f"The corresponding letter for {injection_pos} is {injection_pos_letter}")
+    # Add color for both injection position and letter
+    st.write(f"The selected injection position is: <span style='color:{load_color}'>{injection_pos}</span> with corresponding letter: <span style='color:{load_color}'>{injection_pos_letter}</span>", unsafe_allow_html=True)
 
-    # Injection volumes
+    # Injection volumes (default)
     injection_vol = 0.1
 
     injection_vol = st.slider("2.Select your injection volume", 0.01, 20.0, injection_vol, 0.01)
