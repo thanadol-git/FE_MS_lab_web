@@ -12,6 +12,11 @@ def sample_info():
     # Samplee/ cohort name
     sample_name = st.sidebar.text_input("Main cohort name/abbreviation", "Cohort_1")
     
+        # plate id 
+    if not plate_id:
+        plate_id = sample_name
+    
+    
     return proj_name, organism, sample, plate_id, sample_name
     
 def ms_info():
