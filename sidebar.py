@@ -22,7 +22,9 @@ def create_sidebar():
         "TSQ Altis": ["SRM"],
         "LIT Stellar": ["DIA", "DDA", "PRM", "SRM"]
     }
-    # SDRF content
+    # MS content
+    st.sidebar.header("MS setup")
+    
     # Acquisition technique 
     acq_tech = st.sidebar.selectbox("Select your acquisition",ms_options[machine])
 
