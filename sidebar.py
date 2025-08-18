@@ -15,7 +15,7 @@ def sample_info():
         # plate id 
     if not plate_id:
         plate_id = sample_name
-    
+
     
     return proj_name, organism, sample, plate_id, sample_name
     
@@ -27,9 +27,19 @@ def ms_info():
         "TSQ Altis": ["SRM"],
         "LIT Stellar": ["DIA", "DDA", "PRM", "SRM"]
     }
+    
+    ms_accession = {
+        "Q Exactive HF": "NT=Q Exactive HF;AC=MS:1002523",
+        "TSQ Altis": "NT=TSQ Altis;AC=MS:1002874",
+        "LIT Stellar": "NT=Stellar;AC=MS:1003409"
+    }
+    
     # Acquisition technique 
     acq_tech = st.sidebar.selectbox("Select your acquisition",ms_options[machine])
 
+    # sdrf ms 
+    sdrf_ms = ms_accession[machine]
+    
     # Initialize srm_lot with default value
     srm_lot = None
     
