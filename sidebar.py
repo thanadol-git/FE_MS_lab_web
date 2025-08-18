@@ -50,7 +50,7 @@ def ms_info():
         if srm_lot: 
             st.sidebar.markdown(f"The ProteomEdge Lot <span style='color:red'>{srm_lot}</span>", unsafe_allow_html=True)
 
-    return machine, acq_tech, srm_lot
+    return machine, acq_tech, srm_lot, sdrf_ms
 
 def create_sidebar():
     # Create a sidebar
