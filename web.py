@@ -270,7 +270,7 @@ with sample_order:
 
     with cols[1]:
         ## QC standard parameters
-        st.markdown("### QC Plasma standard")
+        st.markdown("### QC Plasma")
 
         qc_path = st.text_input("Enter the path to the QC standard", "C:\\data\\QC")
         qc_method = st.text_input("Enter the method file for QC standard", "C:\\Xcalibur\\methods\\QC")
@@ -292,7 +292,21 @@ with sample_order:
         
         # st.write(qc_df, index=False )
 
+    with col[2]:
+        ## QC between samples
+        st.markdown("### QC between samples")
+        qc_between_path = st.text_input("Enter the path to the between QC standard", "C:\\data\\QC_between")
+        qc_between_method = st.text_input("Enter the method file for between QC standard", "C:\\Xcalibur\\methods\\QC_between")
+        qc_between_pos = st.text_input("Enter the position for between QC standard", "GE2")
+        injection_vol_qc_between = st.text_input("Modify your 'QC between' injection volume (ul)", str(injection_vol))
         
+        qc_between_df = pd.DataFrame({
+            "File Name": ['QC_between'],
+            "Path": [qc_between_path],
+            "Instrument Method": [qc_between_method],
+            "Position": [qc_between_pos],
+            "Inj Vol": [injection_vol_qc_between]
+        })
 
     # Download data
 
