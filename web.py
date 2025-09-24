@@ -247,7 +247,7 @@ with sample_order:
     output_order_df_rand = output_order_df.sample(frac=1).reset_index(drop=True)
     
     # QC standard and washes 
-    cols = st.columns(2)
+    cols = st.columns(3)
     with cols[0]:
         
         st.markdown("### Wash")
