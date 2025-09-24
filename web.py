@@ -292,7 +292,7 @@ with sample_order:
         
         # st.write(qc_df, index=False )
 
-    with col[2]:
+    with cols[2]:
         ## QC between samples
         st.markdown("### QC between samples")
         qc_between_path = st.text_input("Enter the path to the between QC standard", "C:\\data\\QC_between")
