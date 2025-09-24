@@ -290,18 +290,18 @@ with sample_order:
         qc_df = pd.concat([qc_df, wash_df], axis=0)
         qc_df = qc_df.reset_index(drop=True)
         
-        # st.write(qc_df, index=False )
+        st.write(qc_df, index=False )
 
     with cols[2]:
         ## QC between samples
         st.markdown("### QC between samples")
-        # Tickbox for including QC between samples
-        include_qc_between = st.checkbox("Include QC between samples", value=True)
         qc_between_path = st.text_input("Enter the path to the between QC standard", "C:\\data\\QC_between")
         qc_between_method = st.text_input("Enter the method file for between QC standard", "C:\\Xcalibur\\methods\\QC_between")
         qc_between_pos = st.text_input("Enter the position for between QC standard", "GE2")
         injection_vol_qc_between = st.text_input("Modify your 'QC between' injection volume (ul)", str(injection_vol))
-        
+        # Tickbox for including QC between samples
+        include_qc_between = st.checkbox("Include QC between samples", value=True)
+
         qc_between_df = pd.DataFrame({
             "File Name": ['QC_between'],
             "Path": [qc_between_path],
