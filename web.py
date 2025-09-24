@@ -301,7 +301,7 @@ with sample_order:
         include_qc_between = st.checkbox("Include QC between samples", value=True)
 
         qc_between_df = pd.DataFrame({
-            "File Name": ['QC_between'],
+            "File Name": ['QC_' + date_injection],
             "Path": [qc_between_path],
             "Instrument Method": [qc_between_method],
             "Position": [qc_between_pos],
@@ -309,9 +309,12 @@ with sample_order:
         })
         
         qc_between_df_pre = pd.concat([wash_df, qc_between_df], axis=0)
-        qc_between_df_pre = qc_between_df.reset_index(drop=True)
+        # append File Name in qc_between_df_pre with _1
+        qc_between_df_pre['File Name'] = qc_between_df_pre['File Name'] + '_1'
+        qc_between_df_pre = qc_between_df_pre.reset_index(drop=True)
 
         qc_between_df_post = pd.concat([qc_between_df, wash_df], axis=0)
+        qc_between_df_post['File Name'] = qc_between_df_post['File Name'] + '_2'
         qc_between_df_post = qc_between_df_post.reset_index(drop=True)
 
     # Download data
