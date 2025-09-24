@@ -290,8 +290,6 @@ with sample_order:
         qc_df = pd.concat([qc_df, wash_df], axis=0)
         qc_df = qc_df.reset_index(drop=True)
         
-        st.write(qc_df, index=False )
-
     with cols[2]:
         ## QC between samples
         st.markdown("### QC between samples")
@@ -309,6 +307,12 @@ with sample_order:
             "Position": [qc_between_pos],
             "Inj Vol": [injection_vol_qc_between]
         })
+        
+        qc_between_df_pre = pd.concat([wash_df, qc_between_df], axis=0)
+        qc_between_df_pre = qc_between_df.reset_index(drop=True)
+
+        qc_between_df_post = pd.concat([qc_between_df, wash_df], axis=0)
+        qc_between_df_post = qc_between_df_post.reset_index(drop=True)
 
     # Download data
 
