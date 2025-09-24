@@ -334,6 +334,9 @@ with sample_order:
     # concat wash and qc dataframes
     output_with_wash = pd.concat([wash_df, qc_df, output_with_wash, qc_df], ignore_index=True)
     
+    if qc_between_df.shape[0] > 0 and include_qc_between:
+        output_with_wash = pd.concat([qc_between_df_pre, output_with_wash, qc_between_df_post], ignore_index=True)
+    
     # Store output_order_df in session state for SDRF tab
     st.session_state.output_order_df = output_order_df
     
