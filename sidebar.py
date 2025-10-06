@@ -80,7 +80,7 @@ def ms_info():
     
 
 
-    return machine, srm_lot, sdrf_ms, digestion_enz, dissociation_method, sdrf_enz
+    return machine, srm_lot, sdrf_ms, acq_tech, digestion_enz, dissociation_method, sdrf_enz
 
 def create_sidebar():
     # Create a sidebar
@@ -90,10 +90,16 @@ def create_sidebar():
     # Pass the values from sample_info
     proj_name, organism, sample, plate_id, sample_name = sample_info()
 
+    # Pass the values from ms_info
+    machine, srm_lot, sdrf_ms, acq_tech, digestion_enz, dissociation_method, sdrf_enz = ms_info()
+
+    # PRitnt sdrf_enz for debugging
+    st.sidebar.write(sdrf_enz)
+
+
     # MS content
     st.sidebar.header("MS setup")
 
-    # Pass the values from ms_info
-    machine, srm_lot, sdrf_ms, digestion_enz, dissociation_method = ms_info()
 
-    return proj_name, organism, sample, plate_id, sample_name, machine , srm_lot, sdrf_ms, digestion_enz, dissociation_method
+
+    return proj_name, organism, sample, plate_id, sample_name, machine , srm_lot, sdrf_ms, acq_tech, digestion_enz, dissociation_method, sdrf_enz

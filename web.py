@@ -13,7 +13,7 @@ from tabs.intro_tab import intro_detail
 # from tabs.sdrf_tab import sdrf_tab
 
 # Results from Sidebar script
-proj_name, organism, sample, plate_id, sample_name, machine, acq_tech, srm_lot, sdrf_ms, digestion_enz, dissociation_method = create_sidebar()
+proj_name, organism, sample, plate_id, sample_name, machine , srm_lot, sdrf_ms, acq_tech, digestion_enz, dissociation_method, sdrf_enz= create_sidebar()
 
 
 # Create three tabs
