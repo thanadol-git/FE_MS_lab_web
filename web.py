@@ -382,6 +382,10 @@ with sdrf_tab:
     sample_prop['organism'] = ["Homo sapiens"] * sample_prop.shape[0]
     # Organism part
     sample_prop['organism part'] = ["plasma"] * sample_prop.shape[0]
+    # Plate
+    sample_prop['plate'] = [plate_id] * sample_prop.shape[0]
+    # Project
+    sample_prop['project'] = [proj_name] * sample_prop.shape[0]
     # age
     sample_prop['age'] = ["no available"] * sample_prop.shape[0]
     # developmental stage
