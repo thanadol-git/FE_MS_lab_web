@@ -461,9 +461,7 @@ with sdrf_tab:
 
     # Data file properties (MS)
     data_file_prop = pd.DataFrame({
-        # "data file name": output_order_df["File Name"] + "." + ms_file,
-        # "file type": [ms_file] * output_order_df.shape[0],
-        # "file uri": output_order_df["File Name"] + "." + ms_file, 
+       
         "file uri": machine,
         "label": "AC=MS:1002038;NT=label free sample", 
         "fraction identifier": "1", 
@@ -471,30 +469,15 @@ with sdrf_tab:
         "instrument": machine, 
         "instrument model": machine,
         "instrument identifier": machine,
-        "cleavage ageent parameters": "AC=MS:1001251;NT=Trypsin",
+        "cleavage agent parameters": "AC=MS:1001251;NT=Trypsin",
         "modification parameters": "NT=Carbamidomethyl;AC=UNIMOD:4;TA=C;MT=Fixed", 
-        "precurosr mass tolerance": "40 ppm",
+        "precursor mass tolerance": "40 ppm",
         "fragment mass tolerance": "0.05 Da",
         "MS1 scan range": "400-1250 m/z",
         "MS2 scan range": "100-2000 m/z",
         
     })
-    # Create empty pandas DataFrame 
-    # comment_df = pd.DataFrame(columns=[
-    #     "source name",
-    # sdrf_df["comment[proteomics data acquisition method]"] = "T=Data-Independent Acquisition;AC=NCIT:C161786"
-    # sdrf_df["comment[fractionation method]"] = "NT=High-performance liquid chromatography;AC=PRIDE:0000565"
-    # sdrf_df["comment[fraction identifier]"] = "1"
-    # sdrf_df["comment[label]"] = "AC=MS:1002038;NT=label free sample"
-    # sdrf_df["comment[technical replicate]"] = "1"
-    # # sdrf_df["comment[cleavage agent details]"] = "not available"
-    # sdrf_df["comment[ms2 mass analyzer]"] = "NT=Trypsin;AC=MS:1001251"
-    # sdrf_df["comment[instrument]"] = "not available"
-    # sdrf_df["comment[modification parameters]"] = "not available"
-    # sdrf_df["comment[dissociation method]"] = "AC=MS:1000422;NT=HCD"
-    # sdrf_df["comment[collision energy]"] = "27 NCE"
-    # sdrf_df["comment[precursor mass tolerance]"] = "not available"
-    # sdrf_df["comment[fragment mass tolerance]"] = "not available"
+
 
     st.write(sample_prop)
     st.write(data_file_prop)
