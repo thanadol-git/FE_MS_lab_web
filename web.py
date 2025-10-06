@@ -378,12 +378,31 @@ with sdrf_tab:
 
     # Create sample properties from Thermo injection table 
     sample_prop = plate_df_long.copy()
+    # Organism column
+    sample_prop['organism'] = ["Homo sapiens"] * sample_prop.shape[0]
+    # Organism part
+    sample_prop['organism part'] = ["plasma"] * sample_prop.shape[0]
+    # age
+    sample_prop['age'] = ["no available"] * sample_prop.shape[0]
+    # developmental stage
+    sample_prop['developmental stage'] = ["no available"] * sample_prop.shape[0]
+    # sex
+    sample_prop['sex'] = ["no available"] * sample_prop.shape[0]
+    # ancestry category
+    sample_prop['ancestry category'] = ["no available"] * sample_prop.shape[0]
+    # cell type
+    sample_prop['cell type'] = ["no available"] * sample_prop.shape[0]
+    # cell line
+    sample_prop['cell line'] = ["no available"] * sample_prop.shape[0]
+    # disease
+    sample_prop['disease'] = ["no available"] * sample_prop.shape[0]
+    # individual
+    sample_prop['individual'] = ["no available"] * sample_prop.shape[0]
+    # biological replicate
+    sample_prop['biological replicate'] = ["1"] * sample_prop.shape[0]
 
-    # Add plate
-
-    
-
-
+    # Rename all columns with characteristics[]
+    sample_prop.columns = 'characteristics[' + sample_prop.columns + ']'
     # Create a DataFrame for the SDRF
     sdrf_df = pd.DataFrame({
         # "source name": [f"{proj_name}_{sample_name}"],
