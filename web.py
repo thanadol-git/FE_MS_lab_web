@@ -407,57 +407,14 @@ with sdrf_tab:
 
     # Rename all columns with characteristics[]
     sample_prop.columns = 'characteristics[' + sample_prop.columns + ']'
-    # Create a DataFrame for the SDRF
-    # sdrf_df = pd.DataFrame({'data file' : output_order_df["File Name"] + "." + ms_file,
-    #                         'file uri' : output_order_df["File Name"] + "." + ms_file, 
-    #                         'proteomics data acquisition method' : ["NT=Data-Independent Acquisition;AC=NCIT:C161786"],
-    #                         'label' : ["AC=MS:1002038;NT=label free sample"],
-    #                         'fractionation identifier' : '1',
-    #                         'fractionation method' : ["NT=High-performance liquid chromatography;AC=PRIDE:0000565"],
-    #                         'technical replicate' : '1',
-    #                         'cleavage agent details' : ["NT=Trypsin;AC=MS:1001251"],
-    #                         'ms2 mass analyzer' : ["not available"],
-    #                         'instrument' : ["NT=Q Exactive HF;AC=MS:1002523"],
-    #                         'modification parameters' : ["not available"],
-    #                         'dissociation method' : ["AC=MS:1000422;NT=HCD"],
-    #                         'collision energy' : ["27 NCE"],
-    #                         'precursor mass tolerance' : ["not available"],
-    #                         'fragment mass tolerance' : ["not available"]   
-                        # })
-        # "source name": [f"{proj_name}_{sample_name}"],
-        # "characteristics[organism]": ["Homo sapiens"],
-        # "characteristics[organism part]": ["plasma"], 
-        # "characteristics[age]" : ["not available"], 
-        # "characteristics[developmental stage]" : ["not available"], 
-        # "characteristics[sex]" : ["not available"], ["not available"], 
-        # "characteristics[ancestry category]" : ["not available"], 
-        # "characteristics[cell type]" : ["not available"], 
-        # "characteristics[cell line]" : ["not available"], 
-        # "characteristics[disease]" : ["not available"], 
-        # "characteristics[individual]" : ["not available"], 
-        # "characteristics[biological replicate]" : ["1"]
-        # "material type" : ["plasma"],
-    #     "assay name" : [f"run {i}" for i in range(1, output_order_df.shape[0] + 1)],
-    #     # "technology type" : ["proteomic profiling by mass spectrometry"]
-    #     "comment[data file]" : output_order_df["File Name"]+ "." + ms_file,
-    #     "comment[file uri]"	: output_order_df["File Name"] + "." + ms_file #,
-    #     # "comment[proteomics data acquisition method]" : ["NT=Data-Independent Acquisition;AC=NCIT:C161786"],
-    #     # "comment[fractionation method]"	: ["NT=High-performance liquid chromatography;AC=PRIDE:0000565"],
-    #     # "comment[fraction identifier]" :	["1"],
-    #     # "comment[label]" : ["AC=MS:1002038;NT=label free sample"],	
-    #     # "comment[technical replicate]" : ["1"],	
-    #     # "comment[cleavage agent details]" : ["NT=Trypsin;AC=MS:1001251"],	
-    #     # "comment[cleavage agent details]" : ["NT=Lys-C;AC=MS:1001309"],	
-    #     # "comment[ms2 mass analyzer]" : ["not available"], 	
-    #     # "comment[instrument]" : ["NT=Q Exactive HF;AC=MS:1002523"]
-    #     # "comment[modification parameters]" :	["not available"]
-    #     # "comment[dissociation method]" : ["AC=MS:1000422;NT=HCD"], 
-    #     # "comment[collision energy]" :	["27 NCE"],
-    #     # "comment[precursor mass tolerance]" :	["not available"]
-    #     # "comment[fragment mass tolerance]" : ["not available"]
+    
+    # Adding three columns and first column is source name
+    sample_prop.insert(0, 'source name', output_order_df['File Name'])
+    sample_prop['Material type'] = ["AC=EFO:0009656;NT=plasma"] * sample_prop.shape[0]
+    # run 1 to n row number
+    sample_prop['assay name'] = ['run ' + str(i) for i in range(1, sample_prop.shape[0] + 1)]
+    sample_prop['technology type'] = 'proteomics profiling by mass spectrometry'
 
-
-    # })
 
     # Data file properties (MS)
     data_file_prop = pd.DataFrame({
@@ -480,24 +437,31 @@ with sdrf_tab:
         "MS2 scan range": ["100-2000 m/z"] * len(output_order_df)
     })
 
+    # rename
+    data_file_prop.columns = 'comment[' + data_file_prop.columns + ']'
 
+    # Colbind sample_prop and data_file_prop
+    sdrf_df = pd.concat([sample_prop, data_file_prop], axis=1)
 
-    st.write(sample_prop)
-    st.write(data_file_prop)
+    # Add factor value 
+    sdrf_df['factor value[File]'] = sdrf_df['source name']
+
+    st.write(sdrf_df)
+    
+    # Download SDRF file
+    # fix datetime to YYMMDD
+    sdrf_filename = "_".join([datetime.now().strftime("%Y%m%d"), proj_name, plate_id]) + ".sdrf.tsv"
+    sdrf_tsv = sdrf_df.to_csv(sep='\t', index=False)
+
+    st.download_button(
+        label="Download SDRF",
+        data=sdrf_tsv,
+        file_name=sdrf_filename,
+        mime='text/tab-separated-values'
+    )
+
     # Add link to website github.com/thanadol-git/quantms_example/
     url = "https://www.github.com/thanadol-git/quantms_example/"
     st.markdown("check out this [link](%s)" % url)
 
-    # # Convert DataFrame to CSV
-    # csv_data = sdrf_df.to_csv(index=False)
     
-    # # Add 'Type=4,,,,' to the beginning of the CSV data
-    # csv_data = 'Bracket Type=4,,,,\n' + csv_data
-    
-    # # Download button for SDRF
-    # st.markdown("Click below to download the SDRF data.") 
-    # st.download_button(
-    #     label="Download SDRF",
-    #     data=csv_data,
-    #     file_name=f"{proj_name}_SDRF.csv",
-    #     mime='csv'
