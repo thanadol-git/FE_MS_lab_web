@@ -461,22 +461,23 @@ with sdrf_tab:
 
     # Data file properties (MS)
     data_file_prop = pd.DataFrame({
-        "data file name": output_order_df["File Name"] + "." + ms_file,
-        "file type": [ms_file] * output_order_df.shape[0],
-        "file uri": output_order_df["File Name"] + "." + ms_file, 
-        "comment[instrument]": [machine] * output_order_df.shape[0],
-        "comment[proteomics data acquisition method]" : [acq_tech] * output_order_df.shape[0],
-        "comment[fractionation method]" : ["not available"] * output_order_df.shape[0],
-        "comment[fraction identifier]" : ['1'] * output_order_df.shape[0],
-        "comment[label]" : ["AC=MS:1002038;NT=label free sample"] * output_order_df.shape[0],
-        "comment[technical replicate]" : ['1'] * output_order_df.shape[0],
-        "comment[cleavage agent details]" : ["NT=Trypsin;AC=MS:1001251"] * output_order_df.shape[0],
-        "comment[ms2 mass analyzer]" : ["no available"] * output_order_df.shape[0],
-        "comment[modification parameters]" : ["no available"] * output_order_df.shape[0],
-        "comment[dissociation method]" : ["HCD"] * output_order_df.shape[0],
-        "comment[collision energy]" : ["27 NCE"] * output_order_df.shape[0],
-        "comment[precursor mass tolerance]" : ["not available"] * output_order_df.shape[0],
-        "comment[fragment mass tolerance]" : ["not available"] * output_order_df.shape[0]
+        # "data file name": output_order_df["File Name"] + "." + ms_file,
+        # "file type": [ms_file] * output_order_df.shape[0],
+        # "file uri": output_order_df["File Name"] + "." + ms_file, 
+        "file uri": machine,
+        "label": "AC=MS:1002038;NT=label free sample", 
+        "fraction identifier": "1", 
+        "technical replicate": "1",
+        "instrument": machine, 
+        "instrument model": machine,
+        "instrument identifier": machine,
+        "cleavage ageent parameters": "AC=MS:1001251;NT=Trypsin",
+        "modification parameters": "NT=Carbamidomethyl;AC=UNIMOD:4;TA=C;MT=Fixed", 
+        "precurosr mass tolerance": "40 ppm",
+        "fragment mass tolerance": "0.05 Da",
+        "MS1 scan range": "400-1250 m/z",
+        "MS2 scan range": "100-2000 m/z",
+        
     })
     # Create empty pandas DataFrame 
     # comment_df = pd.DataFrame(columns=[
