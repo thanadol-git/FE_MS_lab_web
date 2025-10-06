@@ -460,26 +460,25 @@ with sdrf_tab:
     # })
 
     # Data file properties (MS)
-
-    # data_file_prop = pd.DataFrame({
-    #     "data file" : output_order_df["File Name"] + "." + ms_file,
-    #     "file uri" : output_order_df["File Name"] + "." + ms_file,
-    #     "proteomics data acquisition method" : ["NT=Data-Independent Acquisition;AC=NCIT:C161786"],
-    #     "label" : ["AC=MS:1002038;NT=label free sample"],
-    #     "fraction identifier" : '1',
-    #     "fractionation method" : ["NT=High-performance liquid chromatography;AC=PRIDE:0000565"],
-    #     "technical replicate" : '1',
-    #     "cleavage agent details" : ["NT=Trypsin;AC=MS:1001251"],
-    #     "ms2 mass analyzer" : ["not available"],
-    #     "instrument" : [machine],   
-    #     "modification parameters" : ["NT=Carbamidomethyl;AC=UNIMOD:4;TA=C;MT=Fixed"],
-    #     "dissociation method" : ["AC=MS:1000422;NT=HCD"],
-    #     "collision energy" : ["27 NCE"],
-    #     "precursor mass tolerance" : ["40 ppm"],
-    #     "fragment mass tolerance" : ["0.05 Da"],
-    #     "MS1 scan range" : ["400-1250 m/z"],
-    #     "MS2 scan range" : ["100-2000 m/z"]
-    # })
+    data_file_prop = pd.DataFrame({
+        "data file": output_order_df["File Name"] + "." + ms_file,
+        "file uri": output_order_df["File Name"] + "." + ms_file,
+        "proteomics data acquisition method": ["NT=Data-Independent Acquisition;AC=NCIT:C161786"] * len(output_order_df),
+        "label": ["AC=MS:1002038;NT=label free sample"] * len(output_order_df),
+        "fraction identifier": ["1"] * len(output_order_df),
+        "fractionation method": ["NT=High-performance liquid chromatography;AC=PRIDE:0000565"] * len(output_order_df),
+        "technical replicate": ["1"] * len(output_order_df),
+        "cleavage agent details": ["NT=Trypsin;AC=MS:1001251"] * len(output_order_df),
+        "ms2 mass analyzer": ["not available"] * len(output_order_df),
+        "instrument": [machine] * len(output_order_df),
+        "modification parameters": ["NT=Carbamidomethyl;AC=UNIMOD:4;TA=C;MT=Fixed"] * len(output_order_df),
+        "dissociation method": ["AC=MS:1000422;NT=HCD"] * len(output_order_df),
+        "collision energy": ["27 NCE"] * len(output_order_df),
+        "precursor mass tolerance": ["40 ppm"] * len(output_order_df),
+        "fragment mass tolerance": ["0.05 Da"] * len(output_order_df),
+        "MS1 scan range": ["400-1250 m/z"] * len(output_order_df),
+        "MS2 scan range": ["100-2000 m/z"] * len(output_order_df)
+    })
 
 
 
