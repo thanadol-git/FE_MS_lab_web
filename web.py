@@ -12,8 +12,8 @@ from tabs.intro_tab import intro_detail
 # from tabs.plate_tab import plate_design_tab
 # from tabs.sdrf_tab import sdrf_tab
 
-# Sidebar
-proj_name, organism, sample, plate_id, sample_name, machine, acq_tech = create_sidebar()
+# Results from Sidebar script
+proj_name, organism, sample, plate_id, sample_name, machine, acq_tech, srm_lot, sdrf_ms, digestion_enz, dissociation_method = create_sidebar()
 
 
 # Create three tabs
@@ -426,8 +426,8 @@ with sdrf_tab:
         "fractionation method": ["NT=High-performance liquid chromatography;AC=PRIDE:0000565"] * len(output_order_df),
         "technical replicate": ["1"] * len(output_order_df),
         "cleavage agent details": ["NT=Trypsin;AC=MS:1001251"] * len(output_order_df),
-        "ms2 mass analyzer": ["not available"] * len(output_order_df),
-        "instrument": [machine] * len(output_order_df),
+        "ms2 mass analyzer": ["no available"] * len(output_order_df),
+        "instrument": [sdrf_ms] * len(output_order_df),
         "modification parameters": ["NT=Carbamidomethyl;AC=UNIMOD:4;TA=C;MT=Fixed"] * len(output_order_df),
         "dissociation method": ["AC=MS:1000422;NT=HCD"] * len(output_order_df),
         "collision energy": ["27 NCE"] * len(output_order_df),

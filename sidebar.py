@@ -28,7 +28,15 @@ def ms_info():
         "TSQ Altis": ["SRM"],
         "LIT Stellar": ["DIA", "DDA", "PRM", "SRM"]
     }
-    
+    # Acquisition technique accession
+    ms_acquisition = {
+        "DIA": "NT=Data Independent Acquisition;AC=MS:1002804",
+        "DDA": "NT=Data Dependent Acquisition;AC=MS:1001310",
+        "PRM": "NT=Parallel Reaction Monitoring;AC=MS:1002956",
+        "SRM": "NT=Selected Reaction Monitoring;AC=MS:1000423"
+    }
+
+
     ms_accession = {
         "Q Exactive HF": "NT=Q Exactive HF;AC=MS:1002523",
         "TSQ Altis": "NT=TSQ Altis;AC=MS:1002874",
@@ -40,6 +48,9 @@ def ms_info():
 
     # sdrf ms 
     sdrf_ms = ms_accession[machine]
+
+    # sdrf ms acquisition
+    acquisition_sdrf += f"|{ms_acquisition[acq_tech]}"
     
     # Initialize srm_lot with default value
     srm_lot = None
@@ -67,18 +78,20 @@ def ms_info():
     # sdrf_enz = [enz_accession.get(enzyme, f"NT={enzyme};AC=unknown") for enzyme in digestion_enz]
 
 
-    return machine, acq_tech, srm_lot, sdrf_ms#, #sdrf_enz
+    return machine, acq_tech, srm_lot, sdrf_ms, digestion_enz, dissociation_method
 
 def create_sidebar():
     # Create a sidebar
     st.sidebar.header("Sample information")
     st.sidebar.write("This part is needed for every file that we are creating.")
 
+    # Pass the values from sample_info
     proj_name, organism, sample, plate_id, sample_name = sample_info()
 
     # MS content
     st.sidebar.header("MS setup")
 
-    machine, acq_tech, srm_lot, sdrf_ms = ms_info()
+    # Pass the values from ms_info
+    machine, acq_tech, srm_lot, sdrf_ms, digestion_enz, dissociation_method = ms_info()
 
-    return proj_name, organism, sample, plate_id, sample_name, machine, acq_tech
+    return proj_name, organism, sample, plate_id, sample_name, machine , srm_lot, sdrf_ms, digestion_enz, dissociation_method
