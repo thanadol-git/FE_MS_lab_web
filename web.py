@@ -377,7 +377,9 @@ with sdrf_tab:
         st.stop()
 
     # Create sample properties from Thermo injection table 
-    sample_prop = output_order_df.copy()
+    sample_prop = plate_df_long.copy()
+
+    # Add plate
 
     
 
