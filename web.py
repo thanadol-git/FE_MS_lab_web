@@ -408,7 +408,22 @@ with sdrf_tab:
     # Rename all columns with characteristics[]
     sample_prop.columns = 'characteristics[' + sample_prop.columns + ']'
     # Create a DataFrame for the SDRF
-    sdrf_df = pd.DataFrame({
+    # sdrf_df = pd.DataFrame({'data file' : output_order_df["File Name"] + "." + ms_file,
+    #                         'file uri' : output_order_df["File Name"] + "." + ms_file, 
+    #                         'proteomics data acquisition method' : ["NT=Data-Independent Acquisition;AC=NCIT:C161786"],
+    #                         'label' : ["AC=MS:1002038;NT=label free sample"],
+    #                         'fractionation identifier' : '1',
+    #                         'fractionation method' : ["NT=High-performance liquid chromatography;AC=PRIDE:0000565"],
+    #                         'technical replicate' : '1',
+    #                         'cleavage agent details' : ["NT=Trypsin;AC=MS:1001251"],
+    #                         'ms2 mass analyzer' : ["not available"],
+    #                         'instrument' : ["NT=Q Exactive HF;AC=MS:1002523"],
+    #                         'modification parameters' : ["not available"],
+    #                         'dissociation method' : ["AC=MS:1000422;NT=HCD"],
+    #                         'collision energy' : ["27 NCE"],
+    #                         'precursor mass tolerance' : ["not available"],
+    #                         'fragment mass tolerance' : ["not available"]   
+                        # })
         # "source name": [f"{proj_name}_{sample_name}"],
         # "characteristics[organism]": ["Homo sapiens"],
         # "characteristics[organism part]": ["plasma"], 
@@ -422,46 +437,66 @@ with sdrf_tab:
         # "characteristics[individual]" : ["not available"], 
         # "characteristics[biological replicate]" : ["1"]
         # "material type" : ["plasma"],
-        "assay name" : [f"run {i}" for i in range(1, output_order_df.shape[0] + 1)],
-        # "technology type" : ["proteomic profiling by mass spectrometry"]
-        "comment[data file]" : output_order_df["File Name"]+ "." + ms_file,
-        "comment[file uri]"	: output_order_df["File Name"] + "." + ms_file #,
-        # "comment[proteomics data acquisition method]" : ["NT=Data-Independent Acquisition;AC=NCIT:C161786"],
-        # "comment[fractionation method]"	: ["NT=High-performance liquid chromatography;AC=PRIDE:0000565"],
-        # "comment[fraction identifier]" :	["1"],
-        # "comment[label]" : ["AC=MS:1002038;NT=label free sample"],	
-        # "comment[technical replicate]" : ["1"],	
-        # "comment[cleavage agent details]" : ["NT=Trypsin;AC=MS:1001251"],	
-        # "comment[cleavage agent details]" : ["NT=Lys-C;AC=MS:1001309"],	
-        # "comment[ms2 mass analyzer]" : ["not available"], 	
-        # "comment[instrument]" : ["NT=Q Exactive HF;AC=MS:1002523"]
-        # "comment[modification parameters]" :	["not available"]
-        # "comment[dissociation method]" : ["AC=MS:1000422;NT=HCD"], 
-        # "comment[collision energy]" :	["27 NCE"],
-        # "comment[precursor mass tolerance]" :	["not available"]
-        # "comment[fragment mass tolerance]" : ["not available"]
+    #     "assay name" : [f"run {i}" for i in range(1, output_order_df.shape[0] + 1)],
+    #     # "technology type" : ["proteomic profiling by mass spectrometry"]
+    #     "comment[data file]" : output_order_df["File Name"]+ "." + ms_file,
+    #     "comment[file uri]"	: output_order_df["File Name"] + "." + ms_file #,
+    #     # "comment[proteomics data acquisition method]" : ["NT=Data-Independent Acquisition;AC=NCIT:C161786"],
+    #     # "comment[fractionation method]"	: ["NT=High-performance liquid chromatography;AC=PRIDE:0000565"],
+    #     # "comment[fraction identifier]" :	["1"],
+    #     # "comment[label]" : ["AC=MS:1002038;NT=label free sample"],	
+    #     # "comment[technical replicate]" : ["1"],	
+    #     # "comment[cleavage agent details]" : ["NT=Trypsin;AC=MS:1001251"],	
+    #     # "comment[cleavage agent details]" : ["NT=Lys-C;AC=MS:1001309"],	
+    #     # "comment[ms2 mass analyzer]" : ["not available"], 	
+    #     # "comment[instrument]" : ["NT=Q Exactive HF;AC=MS:1002523"]
+    #     # "comment[modification parameters]" :	["not available"]
+    #     # "comment[dissociation method]" : ["AC=MS:1000422;NT=HCD"], 
+    #     # "comment[collision energy]" :	["27 NCE"],
+    #     # "comment[precursor mass tolerance]" :	["not available"]
+    #     # "comment[fragment mass tolerance]" : ["not available"]
 
 
+    # })
+
+    # Data file properties (MS)
+    data_file_prop = pd.DataFrame({
+        "data file name": output_order_df["File Name"] + "." + ms_file,
+        "file type": [ms_file] * output_order_df.shape[0],
+        "file uri": output_order_df["File Name"] + "." + ms_file, 
+        "comment[instrument]": [machine] * output_order_df.shape[0],
+        "comment[proteomics data acquisition method]" : [acq_tech] * output_order_df.shape[0],
+        "comment[fractionation method]" : ["not available"] * output_order_df.shape[0],
+        "comment[fraction identifier]" : ['1'] * output_order_df.shape[0],
+        "comment[label]" : ["AC=MS:1002038;NT=label free sample"] * output_order_df.shape[0],
+        "comment[technical replicate]" : ['1'] * output_order_df.shape[0],
+        "comment[cleavage agent details]" : ["NT=Trypsin;AC=MS:1001251"] * output_order_df.shape[0],
+        "comment[ms2 mass analyzer]" : ["no available"] * output_order_df.shape[0],
+        "comment[modification parameters]" : ["no available"] * output_order_df.shape[0],
+        "comment[dissociation method]" : ["HCD"] * output_order_df.shape[0],
+        "comment[collision energy]" : ["27 NCE"] * output_order_df.shape[0],
+        "comment[precursor mass tolerance]" : ["not available"] * output_order_df.shape[0],
+        "comment[fragment mass tolerance]" : ["not available"] * output_order_df.shape[0]
     })
     # Create empty pandas DataFrame 
     # comment_df = pd.DataFrame(columns=[
     #     "source name",
-    sdrf_df["comment[proteomics data acquisition method]"] = "T=Data-Independent Acquisition;AC=NCIT:C161786"
-    sdrf_df["comment[fractionation method]"] = "NT=High-performance liquid chromatography;AC=PRIDE:0000565"
-    sdrf_df["comment[fraction identifier]"] = "1"
-    sdrf_df["comment[label]"] = "AC=MS:1002038;NT=label free sample"
-    sdrf_df["comment[technical replicate]"] = "1"
-    # sdrf_df["comment[cleavage agent details]"] = "not available"
-    sdrf_df["comment[ms2 mass analyzer]"] = "NT=Trypsin;AC=MS:1001251"
-    sdrf_df["comment[instrument]"] = "not available"
-    sdrf_df["comment[modification parameters]"] = "not available"
-    sdrf_df["comment[dissociation method]"] = "AC=MS:1000422;NT=HCD"
-    sdrf_df["comment[collision energy]"] = "27 NCE"
-    sdrf_df["comment[precursor mass tolerance]"] = "not available"
-    sdrf_df["comment[fragment mass tolerance]"] = "not available"
+    # sdrf_df["comment[proteomics data acquisition method]"] = "T=Data-Independent Acquisition;AC=NCIT:C161786"
+    # sdrf_df["comment[fractionation method]"] = "NT=High-performance liquid chromatography;AC=PRIDE:0000565"
+    # sdrf_df["comment[fraction identifier]"] = "1"
+    # sdrf_df["comment[label]"] = "AC=MS:1002038;NT=label free sample"
+    # sdrf_df["comment[technical replicate]"] = "1"
+    # # sdrf_df["comment[cleavage agent details]"] = "not available"
+    # sdrf_df["comment[ms2 mass analyzer]"] = "NT=Trypsin;AC=MS:1001251"
+    # sdrf_df["comment[instrument]"] = "not available"
+    # sdrf_df["comment[modification parameters]"] = "not available"
+    # sdrf_df["comment[dissociation method]"] = "AC=MS:1000422;NT=HCD"
+    # sdrf_df["comment[collision energy]"] = "27 NCE"
+    # sdrf_df["comment[precursor mass tolerance]"] = "not available"
+    # sdrf_df["comment[fragment mass tolerance]"] = "not available"
 
     st.write(sample_prop)
-    
+    st.write(data_file_prop)
     # Add link to website github.com/thanadol-git/quantms_example/
     url = "https://www.github.com/thanadol-git/quantms_example/"
     st.markdown("check out this [link](%s)" % url)
