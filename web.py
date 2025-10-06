@@ -376,8 +376,12 @@ with sdrf_tab:
         st.warning("Please go to the 'Sample Order' tab first to create the sample order.")
         st.stop()
 
-    # CE = st.markup("Collision Energy (CE) is set to 27 NCE. If you want to change it, please edit the code in the web.py file.")
+    # Create sample properties from Thermo injection table 
+    sample_prop = output_order_df.copy()
+
     
+
+
     # Create a DataFrame for the SDRF
     sdrf_df = pd.DataFrame({
         # "source name": [f"{proj_name}_{sample_name}"],
@@ -431,7 +435,7 @@ with sdrf_tab:
     sdrf_df["comment[precursor mass tolerance]"] = "not available"
     sdrf_df["comment[fragment mass tolerance]"] = "not available"
 
-    st.write(sdrf_df)
+    st.write(sample_prop)
     
     # Add link to website github.com/thanadol-git/quantms_example/
     url = "https://www.github.com/thanadol-git/quantms_example/"
