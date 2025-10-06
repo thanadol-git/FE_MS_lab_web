@@ -50,7 +50,7 @@ def ms_info():
     sdrf_ms = ms_accession[machine]
 
     # sdrf ms acquisition
-    acquisition_sdrf += f"|{ms_acquisition[acq_tech]}"
+    sdrf_acquisition = ms_acquisition[acq_tech]
     
     # Initialize srm_lot with default value
     srm_lot = None
@@ -72,13 +72,15 @@ def ms_info():
         "Chymotrypsin": "NT=Chymotrypsin;AC=MS:1001306"
     }
     
+    # Get the accession list for selected enzymes
+    sdrf_enz = [enz_accession.get(enzyme, f"NT={enzyme};AC=unknown") for enzyme in digestion_enz]
+
     # Dissociation
     dissociation_method = st.sidebar.selectbox("Select your dissociation method", ["ETD", "CID", "HCD"])
-    # Get the accession list for selected enzymes
-    # sdrf_enz = [enz_accession.get(enzyme, f"NT={enzyme};AC=unknown") for enzyme in digestion_enz]
+    
 
 
-    return machine, acq_tech, srm_lot, sdrf_ms, digestion_enz, dissociation_method
+    return machine, srm_lot, sdrf_ms, digestion_enz, dissociation_method, sdrf_enz
 
 def create_sidebar():
     # Create a sidebar
@@ -92,6 +94,6 @@ def create_sidebar():
     st.sidebar.header("MS setup")
 
     # Pass the values from ms_info
-    machine, acq_tech, srm_lot, sdrf_ms, digestion_enz, dissociation_method = ms_info()
+    machine, srm_lot, sdrf_ms, digestion_enz, dissociation_method = ms_info()
 
     return proj_name, organism, sample, plate_id, sample_name, machine , srm_lot, sdrf_ms, digestion_enz, dissociation_method
