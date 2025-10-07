@@ -405,6 +405,10 @@ with sdrf_tab:
     # biological replicate
     sample_prop['biological replicate'] = ["1"] * sample_prop.shape[0]
 
+    # Export column names for factor value
+    sample_prop_columns = sample_prop.columns.tolist()
+
+
     # Rename all columns with characteristics[]
     sample_prop.columns = 'characteristics[' + sample_prop.columns + ']'
     
