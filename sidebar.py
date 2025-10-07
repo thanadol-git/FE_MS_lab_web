@@ -17,9 +17,17 @@ def sample_info():
     if not plate_id:
         plate_id = sample_name
 
-    
-    return proj_name, organism, sample, plate_id, sample_name
-    
+    # return all values
+    sample_info_output = {
+                "proj_name": proj_name,
+        "organism": organism,
+        "sample": sample,
+        "plate_id": plate_id,
+        "sample_name": sample_name
+    }
+
+    return sample_info_output
+
 def ms_info():
     # Instrument
     machine = st.sidebar.selectbox("Select your instrument", ["Q Exactive HF", "TSQ Altis", "LIT Stellar"])
@@ -78,9 +86,19 @@ def ms_info():
     # Dissociation
     dissociation_method = st.sidebar.selectbox("Select your dissociation method", ["ETD", "CID", "HCD"])
     
+    # create dict for all of returns values
+    ms_info_output = {
+        "machine": machine,
+        "srm_lot": srm_lot,
+        "sdrf_ms": sdrf_ms,
+        "acq_tech": acq_tech,
+        "digestion_enz": digestion_enz,
+        "dissociation_method": dissociation_method,
+        "sdrf_enz": sdrf_enz,
+        "sdrf_acquisition": sdrf_acquisition
+    }
 
-
-    return machine, srm_lot, sdrf_ms, acq_tech, digestion_enz, dissociation_method, sdrf_enz
+    return ms_info_output
 
 def create_sidebar():
     # Create a sidebar
@@ -88,13 +106,10 @@ def create_sidebar():
     st.sidebar.write("This part is needed for every file that we are creating.")
 
     # Pass the values from sample_info
-    proj_name, organism, sample, plate_id, sample_name = sample_info()
+    sample_info_output = sample_info()
 
     # Pass the values from ms_info
-    machine, srm_lot, sdrf_ms, acq_tech, digestion_enz, dissociation_method, sdrf_enz = ms_info()
-
-    # PRitnt sdrf_enz for debugging
-    st.sidebar.write(sdrf_enz)
+    ms_info_output = ms_info()
 
 
     # MS content
@@ -102,4 +117,4 @@ def create_sidebar():
 
 
 
-    return proj_name, organism, sample, plate_id, sample_name, machine , srm_lot, sdrf_ms, acq_tech, digestion_enz, dissociation_method, sdrf_enz
+    return ms_info_output, sample_info_output
