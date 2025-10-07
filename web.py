@@ -13,7 +13,7 @@ from tabs.intro_tab import intro_detail
 # from tabs.sdrf_tab import sdrf_tab
 
 # Results from Sidebar script
-proj_name, organism, sample, plate_id, sample_name, machine , srm_lot, sdrf_ms, acq_tech, digestion_enz, dissociation_method, sdrf_enz= create_sidebar()
+ms_info_output, sample_info_output= create_sidebar()
 
 
 # Create three tabs
@@ -96,8 +96,8 @@ with plate_tab:
     # Sample types 
     st.subheader("A. Cohort name")
     
-    st.markdown(f"The main cohort samples will be: <span style='color:red'>{sample_name}</span>", unsafe_allow_html=True)
-    st.markdown(f"Plate ID: <span style='color:red'>{plate_id}</span>", unsafe_allow_html=True)
+    st.markdown(f"The main cohort samples will be: <span style='color:red'>{sample_info_output['sample_name']}</span>", unsafe_allow_html=True)
+    st.markdown(f"Plate ID: <span style='color:red'>{sample_info_output['plate_id']}</span>", unsafe_allow_html=True)
 
     # Adding pool or control
     st.subheader("B. Control or Pool")
@@ -140,7 +140,7 @@ with plate_tab:
 
 
     # Ensure the dataframe has 12 columns and 8 rows
-    data = np.resize(sample_name, (8, 12))
+    data = np.resize(sample_info_output['sample_name'], (8, 12))
     plate_df = pd.DataFrame(data, columns=[str(i) for i in range(1, 13)], index=list('ABCDEFGH'))
     
     # Replace text in the dataframe based on replace_pos
@@ -158,14 +158,14 @@ with plate_tab:
         
     # header 
     st.subheader("C. Layout of plate")
-    plate_df_long = plate_dfplot(plate_df, plate_id)
+    plate_df_long = plate_dfplot(plate_df, sample_info_output['plate_id'])
     
     # Store in session state for use in other tabs
     st.session_state.plate_df_long = plate_df_long
 
 with sample_order:
-    st.header(acq_tech + " Injection")
-    
+    st.header(ms_info_output['acq_tech'] + " Injection")
+
     # Get plate_df_long from session state
     if 'plate_df_long' in st.session_state:
         plate_df_long = st.session_state.plate_df_long.copy()
@@ -237,7 +237,7 @@ with sample_order:
     # Path column 
     plate_df_long['Path'] = uploaded_dir
     # File name 
-    plate_df_long['File Name'] = date_injection + "_" + proj_name + "_" + plate_id + "_" + plate_df_long['Position']
+    plate_df_long['File Name'] = date_injection + "_" + sample_info_output['proj_name'] + "_" + sample_info_output['plate_id'] + "_" + plate_df_long['Position']
     plate_df_long['Position'] =  injection_pos_letter + plate_df_long['Position'] 
     
     output_order_df = plate_df_long[['File Name', 'Path', 'Instrument Method', 'Position','Inj Vol']]
@@ -319,8 +319,8 @@ with sample_order:
 
     # Download data
 
-    ## export order sampel name 
-    sample_order_name = "_".join([datetime.now().strftime("%Y%m%d%H%M"), proj_name, "Sample", "Order", plate_id]) + ".csv"
+    ## export order sample name
+    sample_order_name = "_".join([datetime.now().strftime("%Y%m%d%H%M"), sample_info_output['proj_name'], "Sample", "Order", sample_info_output['plate_id']]) + ".csv"
 
     ## export order sample
     ### DIA/DDA plate
@@ -331,7 +331,7 @@ with sample_order:
     output_with_wash = pd.concat([pd.concat([chunk, wash_df], ignore_index=True) for chunk in chunks], ignore_index=True)
     
     ### SRM plate
-    if acq_tech == "SRM":
+    if ms_info_output['acq_tech'] == "SRM":
         output_with_wash = output_order_df_rand
     
     # concat wash and qc dataframes
@@ -383,9 +383,9 @@ with sdrf_tab:
     # Organism part
     sample_prop['organism part'] = ["plasma"] * sample_prop.shape[0]
     # Plate
-    sample_prop['plate'] = [plate_id] * sample_prop.shape[0]
+    sample_prop['plate'] = [sample_info_output['plate_id']] * sample_prop.shape[0]
     # Project
-    sample_prop['project'] = [proj_name] * sample_prop.shape[0]
+    sample_prop['project'] = [sample_info_output['proj_name']] * sample_prop.shape[0]
     # age
     sample_prop['age'] = ["no available"] * sample_prop.shape[0]
     # developmental stage
@@ -420,22 +420,43 @@ with sdrf_tab:
     data_file_prop = pd.DataFrame({
         "data file": output_order_df["File Name"] + "." + ms_file,
         "file uri": output_order_df["File Name"] + "." + ms_file,
-        "proteomics data acquisition method": ["NT=Data-Independent Acquisition;AC=NCIT:C161786"] * len(output_order_df),
+        "proteomics data acquisition method": [ms_info_output['sdrf_acquisition']] * len(output_order_df),
         "label": ["AC=MS:1002038;NT=label free sample"] * len(output_order_df),
         "fraction identifier": ["1"] * len(output_order_df),
         "fractionation method": ["NT=High-performance liquid chromatography;AC=PRIDE:0000565"] * len(output_order_df),
         "technical replicate": ["1"] * len(output_order_df),
-        "cleavage agent details": ["NT=Trypsin;AC=MS:1001251"] * len(output_order_df),
+        # Add column cleaveage agent details later outside
         "ms2 mass analyzer": ["no available"] * len(output_order_df),
-        "instrument": [sdrf_ms] * len(output_order_df),
+        "instrument": [ms_info_output['sdrf_ms']] * len(output_order_df),
         "modification parameters": ["NT=Carbamidomethyl;AC=UNIMOD:4;TA=C;MT=Fixed"] * len(output_order_df),
         "dissociation method": ["AC=MS:1000422;NT=HCD"] * len(output_order_df),
         "collision energy": ["27 NCE"] * len(output_order_df),
         "precursor mass tolerance": ["40 ppm"] * len(output_order_df),
         "fragment mass tolerance": ["0.05 Da"] * len(output_order_df),
-        "MS1 scan range": ["400-1250 m/z"] * len(output_order_df),
-        "MS2 scan range": ["100-2000 m/z"] * len(output_order_df)
+
     })
+
+    # Add enzyme columns with suffix 
+    if len(ms_info_output['enz_accession_list']) > 0:
+        for i in range(len(ms_info_output['enz_accession_list'])):
+                column_name = "cleavage agent details" + str(i)
+                data_file_prop[column_name] = [ms_info_output['enz_accession_list'][i]] * len(output_order_df)
+
+    # Move all cleavage agent details columns to be after technical replicate
+    cleavage_cols = [col for col in data_file_prop.columns if col.startswith("cleavage agent details")]
+    other_cols = [col for col in data_file_prop.columns if not col.startswith("cleavage agent details")]
+    
+    # Find the index of "technical replicate" column
+    tech_rep_index = other_cols.index("technical replicate") if "technical replicate" in other_cols else 6
+    
+    # Reorder: columns before tech replicate + tech replicate + cleavage columns + remaining columns
+    new_column_order = other_cols[:tech_rep_index+1] + cleavage_cols + other_cols[tech_rep_index+1:]
+    data_file_prop = data_file_prop[new_column_order]
+
+    # For DIA add MS1 and MS2 scan range
+    if ms_info_output['acq_tech'] == "DIA":
+        data_file_prop["MS1 scan range"] = ["400-1250 m/z"] * len(output_order_df)
+        data_file_prop["MS2 scan range"] = ["100-2000 m/z"] * len(output_order_df)
 
     # rename
     data_file_prop.columns = 'comment[' + data_file_prop.columns + ']'
@@ -444,14 +465,19 @@ with sdrf_tab:
     sdrf_df = pd.concat([sample_prop, data_file_prop], axis=1)
 
     # Add factor value 
-    sdrf_df['factor value[File]'] = sdrf_df['source name']
+    sdrf_df['factor value[Sample]'] = sdrf_df['characteristics[Sample]']
+
 
     st.write(sdrf_df)
     
     # Download SDRF file
     # fix datetime to YYMMDD
-    sdrf_filename = "_".join([datetime.now().strftime("%Y%m%d"), proj_name, plate_id]) + ".sdrf.tsv"
+    sdrf_filename = "_".join([datetime.now().strftime("%Y%m%d"), sample_info_output['proj_name'], sample_info_output['plate_id']]) + ".sdrf.tsv"
     sdrf_tsv = sdrf_df.to_csv(sep='\t', index=False)
+
+    # In sdrf_tsv replace first row where comment[cleavage agent details] with any numbers to just comment[cleavage agent details]
+    for i in range(len(ms_info_output['enz_accession_list'])):
+        sdrf_tsv = sdrf_tsv.replace(f'comment[cleavage agent details{i}]', 'comment[cleavage agent details]')
 
     st.download_button(
         label="Download SDRF",
@@ -462,6 +488,6 @@ with sdrf_tab:
 
     # Add link to website github.com/thanadol-git/quantms_example/
     url = "https://www.github.com/thanadol-git/quantms_example/"
-    st.markdown("check out this [link](%s)" % url)
+    st.markdown("comment[cleavage agent details'] will be fixed with the downloaded file. Pandas cannot handle two columns with the same name. check out this [link](%s)" % url)
 
     

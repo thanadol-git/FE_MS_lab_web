@@ -75,13 +75,14 @@ def ms_info():
 
     # Digestion enzyme accession
     enz_accession = {
-        "Trypsin": "NT=Trypsin;AC=MS:1001251",
-        "Lys-C": "NT=Lys-C;AC=MS:1001309",
-        "Chymotrypsin": "NT=Chymotrypsin;AC=MS:1001306"
+        "Trypsin": "AC=MS:1001251;NT=Trypsin",
+        "Lys-C": "AC=MS:1001309;NT=Lys-C",
+        "Chymotrypsin": "AC=MS:1001306;NT=Chymotrypsin"
     }
     
-    # Get the accession list for selected enzymes
-    sdrf_enz = [enz_accession.get(enzyme, f"NT={enzyme};AC=unknown") for enzyme in digestion_enz]
+    # Get the accession from the selected enzymes in list
+    enz_accession_list = [enz_accession[enz] for enz in digestion_enz]
+    
 
     # Dissociation
     dissociation_method = st.sidebar.selectbox("Select your dissociation method", ["ETD", "CID", "HCD"])
@@ -94,7 +95,7 @@ def ms_info():
         "acq_tech": acq_tech,
         "digestion_enz": digestion_enz,
         "dissociation_method": dissociation_method,
-        "sdrf_enz": sdrf_enz,
+        "enz_accession_list": enz_accession_list,
         "sdrf_acquisition": sdrf_acquisition
     }
 
@@ -111,10 +112,8 @@ def create_sidebar():
     # Pass the values from ms_info
     ms_info_output = ms_info()
 
-
     # MS content
     st.sidebar.header("MS setup")
-
 
 
     return ms_info_output, sample_info_output
