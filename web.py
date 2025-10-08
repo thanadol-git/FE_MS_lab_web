@@ -107,9 +107,10 @@ with plate_tab:
     replace_pos = st.text_area("Example Control, Pool or another cohort", example_text).split('\n')
     # Filter row in text that contain 'Col' or 'Row' in replace_pos
     colrow_label = [item for item in replace_pos if ('Col' in item or 'Row' in item)]
-        # Remove row with 'Col' or 'Row in replace_pos
+    # Remove row with 'Col' or 'Row in replace_pos
     replace_pos = [item for item in replace_pos if not ('Col' in item or 'Row' in item)]
     
+        
     # Check Col and Row then append to replace pos each well
     for item in colrow_label:
         if ';' in item:
@@ -126,9 +127,11 @@ with plate_tab:
         else:
             st.warning(f"Invalid format: {item}. It should be like 'Cohort_2;Col8'.")
 
-#    replace_pos =  pd.Series(replace_pos).unique().tolist()
 
     # Write a  warning message if the position is mentioned more than one time in text area
+    if len(replace_pos) != len(set(replace_pos)):
+        st.warning("Some positions are mentioned more than once. Please check your input.")
+
     # Check if the position is mentioned more than one time
     pos_list = []
     for item in list(set(replace_pos)):
