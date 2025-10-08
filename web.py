@@ -371,6 +371,7 @@ with sdrf_tab:
     # CE
     collision_energy = st.text_input("Collision Energy (NCE)", "27")
 
+
     # Get output_order_df from session state
     if 'output_order_df' in st.session_state:
         output_order_df = st.session_state.output_order_df
@@ -417,7 +418,6 @@ with sdrf_tab:
     # Adding three columns and first column is source name
     sample_prop.insert(0, 'source name', output_order_df['File Name'])
     sample_prop['Material type'] = ["AC=EFO:0009656;NT=plasma"] * sample_prop.shape[0]
-    # run 1 to n row number
     sample_prop['assay name'] = ['run ' + str(i) for i in range(1, sample_prop.shape[0] + 1)]
     sample_prop['technology type'] = 'proteomics profiling by mass spectrometry'
 
@@ -470,9 +470,12 @@ with sdrf_tab:
     # Colbind sample_prop and data_file_prop
     sdrf_df = pd.concat([sample_prop, data_file_prop], axis=1)
 
-    # Add factor value 
-    sdrf_df['factor value[Sample]'] = sdrf_df['characteristics[Sample]']
+    factor_value_col = st.selectbox("Select column for factor value", sample_prop_columns)
 
+    # Add factor values based on selected columns
+    # Select box 
+
+    sdrf_df[f'factor value[{factor_value_col}]'] = sdrf_df[f'characteristics[{factor_value_col}]']
 
     st.write(sdrf_df)
     
