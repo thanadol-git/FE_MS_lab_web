@@ -105,12 +105,20 @@ with plate_tab:
     
     example_text = "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1\nCohort_2;RowD\nCohort_2;RowE\nCohort_2;Col9\nCohort_2;Col8"
     replace_pos = st.text_area("Example Control, Pool or another cohort", example_text).split('\n')
+    # ignore empty lines
+    replace_pos = [item for item in replace_pos if item.strip() != '']
+    
     # Filter row in text that contain 'Col' or 'Row' in replace_pos
     colrow_label = [item for item in replace_pos if ('Col' in item or 'Row' in item)]
     # Remove row with 'Col' or 'Row in replace_pos
     replace_pos = [item for item in replace_pos if not ('Col' in item or 'Row' in item)]
     
-        
+    # Write warning message if replace_pos does not have ; as one speical character
+    for item in replace_pos:
+        if ';' not in item or item.count(';') != 1 or any(char in item for char in ['?', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '+', '=', '{', '}', '[', ']', '|', '\\', ':', '"', "'", '<', '>', ',', '.', '/', '~','`']):
+            st.warning(f"Invalid format: {item}. It should be like 'Cohort_2;Col8'.")
+            break
+
     # Check Col and Row then append to replace pos each well
     for item in colrow_label:
         if ';' in item:
@@ -157,8 +165,6 @@ with plate_tab:
     ## Comments for checking
     # st.write(replace_pos)
     
-
-        
     # header 
     st.subheader("C. Layout of plate")
     plate_df_long = plate_dfplot(plate_df, sample_info_output['plate_id'])
