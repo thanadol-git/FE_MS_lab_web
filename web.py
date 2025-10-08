@@ -222,6 +222,11 @@ with sample_order:
     method_file = st.text_input("4.Enter the directory path to the method file", "C:\Xcalibur\methods\method1")
     st.markdown(f"The method file for MS is from: <span style='color:red'>{method_file}</span>", unsafe_allow_html=True)
 
+    # Add link to website github.com/thanadol-git/quantms_example/
+    url = "https://www.github.com/thanadol-git/quantms_example/"
+    st.markdown("comment[cleavage agent details'] will be fixed with the downloaded file. Pandas cannot handle two columns with the same name. check out this [link](%s)" % url)
+
+    
     # Date of injection
     date_injection = st.date_input("5.Date of injection", pd.Timestamp("today"))
     # format date_injection to YYYYMMDD as text
@@ -494,9 +499,3 @@ with sdrf_tab:
         file_name=sdrf_filename,
         mime='text/tab-separated-values'
     )
-
-    # Add link to website github.com/thanadol-git/quantms_example/
-    url = "https://www.github.com/thanadol-git/quantms_example/"
-    st.markdown("comment[cleavage agent details'] will be fixed with the downloaded file. Pandas cannot handle two columns with the same name. check out this [link](%s)" % url)
-
-    
