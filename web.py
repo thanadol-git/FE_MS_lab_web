@@ -440,7 +440,7 @@ with sdrf_tab:
         "ms2 mass analyzer": ["not available"] * len(output_order_df),
         "instrument": [ms_info_output['sdrf_ms']] * len(output_order_df),
         "modification parameters": ["NT=Carbamidomethyl;AC=UNIMOD:4;TA=C;MT=Fixed"] * len(output_order_df),
-        "dissociation method": ["AC=MS:1000422;NT=HCD"] * len(output_order_df),
+        "dissociation method": [ms_info_output['dissociation_accession']] * len(output_order_df),
         "collision energy": [collision_energy + ' NCE'] * len(output_order_df),
         "precursor mass tolerance": ["40 ppm"] * len(output_order_df),
         "fragment mass tolerance": ["0.05 Da"] * len(output_order_df),

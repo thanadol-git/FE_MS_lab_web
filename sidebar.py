@@ -94,9 +94,18 @@ def ms_info():
     # Get the accession from the selected enzymes in list
     enz_accession_list = [enz_accession[enz] for enz in digestion_enz]
     
-
+     # Dissociation method accession
+    dissociation_accession = {
+        "ETD": "NT=Electron Transfer Dissociation;AC=MS:1002592",
+        "CID": "NT=Collision-Induced Dissociation;AC=MS:1000132",
+        "HCD": "NT=Higher-energy Collisional Dissociation;AC=MS:1000422"
+    }
+    
     # Dissociation
-    dissociation_method = st.sidebar.selectbox("Select your dissociation method", ["ETD", "CID", "HCD"])
+    dissociation_method = st.sidebar.selectbox("Select your dissociation method", list(dissociation_accession.keys()), index=2)
+    
+    
+   
     
     # create dict for all of returns values
     ms_info_output = {
@@ -106,6 +115,7 @@ def ms_info():
         "acq_tech": acq_tech,
         "digestion_enz": digestion_enz,
         "dissociation_method": dissociation_method,
+        "dissociation_accession": dissociation_accession[dissociation_method],
         "enz_accession_list": enz_accession_list,
         "sdrf_acquisition": sdrf_acquisition
     }
