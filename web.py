@@ -368,6 +368,8 @@ with sample_order:
 with sdrf_tab:
     st.header("SDRF")
     ms_file = st.selectbox("MS file output", ["RAW", "mzML"])
+    # CE
+    collision_energy = st.text_input("Collision Energy (NCE)", "27")
 
     # Get output_order_df from session state
     if 'output_order_df' in st.session_state:
@@ -434,7 +436,7 @@ with sdrf_tab:
         "instrument": [ms_info_output['sdrf_ms']] * len(output_order_df),
         "modification parameters": ["NT=Carbamidomethyl;AC=UNIMOD:4;TA=C;MT=Fixed"] * len(output_order_df),
         "dissociation method": ["AC=MS:1000422;NT=HCD"] * len(output_order_df),
-        "collision energy": ["27 NCE"] * len(output_order_df),
+        "collision energy": [collision_energy + ' NCE'] * len(output_order_df),
         "precursor mass tolerance": ["40 ppm"] * len(output_order_df),
         "fragment mass tolerance": ["0.05 Da"] * len(output_order_df),
 

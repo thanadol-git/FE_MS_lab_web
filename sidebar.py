@@ -29,6 +29,9 @@ def sample_info():
     return sample_info_output
 
 def ms_info():
+    # MS content
+    st.sidebar.header("MS setup")
+    
     # Instrument
     machine = st.sidebar.selectbox("Select your instrument", ["Q Exactive HF", "TSQ Altis", "LIT Stellar"])
     ms_options = {
@@ -112,8 +115,7 @@ def create_sidebar():
     # Pass the values from ms_info
     ms_info_output = ms_info()
 
-    # MS content
-    st.sidebar.header("MS setup")
+    
 
 
     return ms_info_output, sample_info_output
