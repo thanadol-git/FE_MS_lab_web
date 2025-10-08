@@ -149,7 +149,7 @@ with plate_tab:
             text, pos = item.split(';')
             pos_list.append(pos)
     if len(pos_list) != len(set(pos_list)):
-        st.warning("Position is mentioned more than one time with different labels. Please check your input.")
+        st.warning("Position is mentioned more than one time with different labels. Possibly, using Row or Col. Please check your input.")
 
 
     # Ensure the dataframe has 12 columns and 8 rows
