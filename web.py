@@ -108,16 +108,18 @@ with plate_tab:
     # ignore empty lines
     replace_pos = [item for item in replace_pos if item.strip() != '']
     
-    # Filter row in text that contain 'Col' or 'Row' in replace_pos
-    colrow_label = [item for item in replace_pos if ('Col' in item or 'Row' in item)]
-    # Remove row with 'Col' or 'Row in replace_pos
-    replace_pos = [item for item in replace_pos if not ('Col' in item or 'Row' in item)]
-    
     # Write warning message if replace_pos does not have ; as one speical character
     for item in replace_pos:
         if ';' not in item or item.count(';') != 1 or any(char in item for char in ['?', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '+', '=', '{', '}', '[', ']', '|', '\\', ':', '"', "'", '<', '>', ',', '.', '/', '~','`']):
             st.warning(f"Invalid format: {item}. It should be like 'Cohort_2;Col8'.")
             break
+    
+    # Filter row in text that contain 'Col' or 'Row' in replace_pos
+    colrow_label = [item for item in replace_pos if ('Col' in item or 'Row' in item)]
+    # Remove row with 'Col' or 'Row in replace_pos
+    replace_pos = [item for item in replace_pos if not ('Col' in item or 'Row' in item)]
+    
+
 
     # Check Col and Row then append to replace pos each well
     for item in colrow_label:
@@ -131,7 +133,7 @@ with plate_tab:
                 for letter in 'ABCDEFGH':
                     replace_pos.append(text + ';' + letter + pos[3:])
             else:
-                st.warning(f"Invalid position format: {item}. It should be like 'Cohort_2;C8'.")
+                st.warning(f"Invalid position format: {item}. It should be like 'Cohort_2;RowA' or 'Cohort_2;Col8'.")
         else:
             st.warning(f"Invalid format: {item}. It should be like 'Cohort_2;Col8'.")
 
