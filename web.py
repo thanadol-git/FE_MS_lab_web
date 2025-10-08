@@ -477,12 +477,13 @@ with sdrf_tab:
 
     # For DIA add MS1 and MS2 scan range
     if ms_info_output['acq_tech'] == "DIA":
-        data_file_prop["MS1 scan range"] = ["400-1250 m/z"] * len(output_order_df)
-        data_file_prop["MS2 scan range"] = ["100-2000 m/z"] * len(output_order_df)
+        data_file_prop["MS1 scan range"] = ["400-1250 m/z"] * data_file_prop.shape[0]
+        data_file_prop["MS2 scan range"] = ["100-2000 m/z"] * data_file_prop.shape[0]
 
+    # For SRM add ProteomeEdge lot
     if ms_info_output['acq_tech'] == "SRM":
-        data_file_prop['ProteomeEdge lot'] == sample_info_output['srm_lot']
-    
+        data_file_prop['ProteomeEdge'] = [ms_info_output['srm_lot']] * data_file_prop.shape[0]
+
     # rename
     data_file_prop.columns = 'comment[' + data_file_prop.columns + ']'
 
