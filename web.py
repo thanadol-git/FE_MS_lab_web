@@ -469,6 +469,11 @@ with sdrf_tab:
         data_file_prop["MS1 scan range"] = ["400-1250 m/z"] * len(output_order_df)
         data_file_prop["MS2 scan range"] = ["100-2000 m/z"] * len(output_order_df)
 
+    if ms_info_output['acq_tech'] == "DDA":
+        # remove column proteomics data acquisition method
+        data_file_prop = data_file_prop.drop(columns=["proteomics data acquisition method"])
+    
+    
     # rename
     data_file_prop.columns = 'comment[' + data_file_prop.columns + ']'
 
