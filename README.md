@@ -1,5 +1,7 @@
 # FE_DIA_sdrf
 
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ms-experiment.streamlit.app/)
+
 ## Priority
 
 SDRF
@@ -13,6 +15,3 @@ SDRF
 - Read SDRF paper clearly 
 - Apply the latest DIA from Khue and Yasset cell lines 
 - Making SDRF from webapp
-
-## Link
-[ms-experiment](https://ms-experiment.streamlit.app/)
