@@ -2,10 +2,20 @@ from requests import options
 import streamlit as st
 
 def sample_info():
+    
+    # Organism accession
+    organism_species = {
+        "Human": "Homo sapiens",
+        "Rat": "Rattus norvegicus",
+        "Mouse": "Mus musculus",
+        "Cyanobacteria": "Cyanobacteria",
+        "E.coli": "Escherichia coli",
+    }
+    
     # Project
     proj_name = st.sidebar.text_input("Enter your project name", "Project X")
     # Organism
-    organism = st.sidebar.selectbox("Select your organism", ["Human", "Cyanobacteria", "E.coli"], index=0)
+    organism = st.sidebar.selectbox("Select your organism", list(organism_species.keys()), index=0)
     # Sample type
     sample = st.sidebar.selectbox("Select your sample type", ["Plasma", "Serum", "Tissue", "Cell line", "Cell culture"], index=0)
     # Plate id 
@@ -17,12 +27,7 @@ def sample_info():
     if not plate_id:
         plate_id = sample_name
 
-    # Organism accession
-    organism_species = {
-        "Human": "Homo sapiens",
-        "Cyanobacteria": "Cyanobacteria",
-        "E.coli": "Escherichia coli",
-    }
+
 
     # return all values
     sample_info_output = {
@@ -46,6 +51,13 @@ def ms_info():
         "TSQ Altis": ["SRM"],
         "LIT Stellar": ["DIA", "DDA", "PRM", "SRM"]
     }
+    
+    ms_analyzers = {
+        "Q Exactive HF": ["DIA", "DDA", "PRM"],
+        "TSQ Altis": ["SRM"],
+        "LIT Stellar": ["DIA", "DDA", "PRM", "SRM"]
+    }
+
     # Acquisition technique accession
     ms_acquisition = {
         "DIA": "NT=Data Independent Acquisition;AC=MS:1002804",

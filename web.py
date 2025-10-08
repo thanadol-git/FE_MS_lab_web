@@ -188,7 +188,7 @@ with sample_order:
     # Get the corresponding letter for the selected injection position
     injection_pos_letter = color_to_letter(injection_pos)
     # Add color for both injection position and letter
-    st.write(f"The selected injection position is: <span style='color:{load_color}'>{injection_pos}</span> with corresponding letter: <span style='color:{load_color}'>{injection_pos_letter}</span>", unsafe_allow_html=True)
+    st.write(f"The selected injection position is <span style='color:{load_color}'>{injection_pos}</span> with corresponding letter <span style='color:{load_color}'>{injection_pos_letter}</span>.", unsafe_allow_html=True)
 
     # Injection volumes (default)
     injection_vol = 0.1
