@@ -5,7 +5,7 @@ def sample_info():
     # Project
     proj_name = st.sidebar.text_input("Enter your project name", "Project X")
     # Organism
-    organism = st.sidebar.selectbox("Select your organism", ["Human", "Cyanobacteria", "E.coli", "Cell line"], index=0)
+    organism = st.sidebar.selectbox("Select your organism", ["Human", "Cyanobacteria", "E.coli"], index=0)
     # Sample type
     sample = st.sidebar.selectbox("Select your sample type", ["Plasma", "Serum", "Tissue", "Cell line", "Cell culture"], index=0)
     # Plate id 
@@ -22,7 +22,6 @@ def sample_info():
         "Human": "Homo sapiens",
         "Cyanobacteria": "Cyanobacteria",
         "E.coli": "Escherichia coli",
-        "Cell line": "Cell line"
     }
 
     # return all values
