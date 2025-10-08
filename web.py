@@ -387,19 +387,19 @@ with sdrf_tab:
     # Project
     sample_prop['project'] = [sample_info_output['proj_name']] * sample_prop.shape[0]
     # age
-    sample_prop['age'] = ["no available"] * sample_prop.shape[0]
+    sample_prop['age'] = ["not available"] * sample_prop.shape[0]
     # developmental stage
     sample_prop['developmental stage'] = ["no available"] * sample_prop.shape[0]
     # sex
-    sample_prop['sex'] = ["no available"] * sample_prop.shape[0]
+    sample_prop['sex'] = ["not available"] * sample_prop.shape[0]
     # ancestry category
-    sample_prop['ancestry category'] = ["no available"] * sample_prop.shape[0]
+    sample_prop['ancestry category'] = ["not available"] * sample_prop.shape[0]
     # cell type
     sample_prop['cell type'] = ["no available"] * sample_prop.shape[0]
     # cell line
-    sample_prop['cell line'] = ["no available"] * sample_prop.shape[0]
+    sample_prop['cell line'] = ["not available"] * sample_prop.shape[0]
     # disease
-    sample_prop['disease'] = ["no available"] * sample_prop.shape[0]
+    sample_prop['disease'] = ["not available"] * sample_prop.shape[0]
     # individual
     sample_prop['individual'] = ["no available"] * sample_prop.shape[0]
     # biological replicate
