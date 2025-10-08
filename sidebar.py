@@ -5,9 +5,9 @@ def sample_info():
     # Project
     proj_name = st.sidebar.text_input("Enter your project name", "Project X")
     # Organism
-    organism = st.sidebar.text_input("Select your organism", "Human")
+    organism = st.sidebar.selectbox("Select your organism", ["Human", "Cyanobacteria", "E.coli", "Cell line"], index=0)
     # Sample type
-    sample = st.sidebar.text_input("Enter your sample", "Plasma")
+    sample = st.sidebar.selectbox("Select your sample type", ["Plasma", "Serum", "Tissue", "Cell line", "Cell culture"], index=0)
     # Plate id 
     plate_id = st.sidebar.text_input("Enter your plate ID", "")
     # Samplee/ cohort name
@@ -17,10 +17,18 @@ def sample_info():
     if not plate_id:
         plate_id = sample_name
 
+    # Organism accession
+    organism_species = {
+        "Human": "Homo sapiens",
+        "Cyanobacteria": "Cyanobacteria",
+        "E.coli": "Escherichia coli",
+        "Cell line": "Cell line"
+    }
+
     # return all values
     sample_info_output = {
-                "proj_name": proj_name,
-        "organism": organism,
+        "proj_name": proj_name,
+        "organism_species": organism_species[organism],
         "sample": sample,
         "plate_id": plate_id,
         "sample_name": sample_name

@@ -387,9 +387,9 @@ with sdrf_tab:
     # Create sample properties from Thermo injection table 
     sample_prop = plate_df_long.copy()
     # Organism column
-    sample_prop['organism'] = ["Homo sapiens"] * sample_prop.shape[0]
+    sample_prop['organism'] = [sample_info_output['organism_species']] * sample_prop.shape[0]
     # Organism part
-    sample_prop['organism part'] = ["plasma"] * sample_prop.shape[0]
+    sample_prop['organism part'] = [sample_info_output["sample"]] * sample_prop.shape[0]
     # Plate
     sample_prop['plate'] = [sample_info_output['plate_id']] * sample_prop.shape[0]
     # Project
