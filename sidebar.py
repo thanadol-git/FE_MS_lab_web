@@ -42,12 +42,12 @@ def ms_info():
     # Acquisition technique accession
     ms_acquisition = {
         "DIA": "NT=Data Independent Acquisition;AC=MS:1002804",
-        "DDA": "NT=Data Dependent Acquisition;AC=MS:1001310",
+        "DDA": "NT=Data-Dependent Acquisition;AC=NCIT:C161785",
         "PRM": "NT=Parallel Reaction Monitoring;AC=MS:1002956",
         "SRM": "NT=Selected Reaction Monitoring;AC=MS:1000423"
     }
 
-
+	
     ms_accession = {
         "Q Exactive HF": "NT=Q Exactive HF;AC=MS:1002523",
         "TSQ Altis": "NT=TSQ Altis;AC=MS:1002874",
