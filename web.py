@@ -392,19 +392,19 @@ with sdrf_tab:
     # age
     sample_prop['age'] = ["not available"] * sample_prop.shape[0]
     # developmental stage
-    sample_prop['developmental stage'] = ["no available"] * sample_prop.shape[0]
+    sample_prop['developmental stage'] = ["not available"] * sample_prop.shape[0]
     # sex
     sample_prop['sex'] = ["not available"] * sample_prop.shape[0]
     # ancestry category
     sample_prop['ancestry category'] = ["not available"] * sample_prop.shape[0]
     # cell type
-    sample_prop['cell type'] = ["no available"] * sample_prop.shape[0]
+    sample_prop['cell type'] = ["not available"] * sample_prop.shape[0]
     # cell line
     sample_prop['cell line'] = ["not available"] * sample_prop.shape[0]
     # disease
     sample_prop['disease'] = ["not available"] * sample_prop.shape[0]
     # individual
-    sample_prop['individual'] = ["no available"] * sample_prop.shape[0]
+    sample_prop['individual'] = ["not available"] * sample_prop.shape[0]
     # biological replicate
     sample_prop['biological replicate'] = ["1"] * sample_prop.shape[0]
 
@@ -432,7 +432,7 @@ with sdrf_tab:
         "fractionation method": ["NT=High-performance liquid chromatography;AC=PRIDE:0000565"] * len(output_order_df),
         "technical replicate": ["1"] * len(output_order_df),
         # Add column cleaveage agent details later outside
-        "ms2 mass analyzer": ["no available"] * len(output_order_df),
+        "ms2 mass analyzer": ["not available"] * len(output_order_df),
         "instrument": [ms_info_output['sdrf_ms']] * len(output_order_df),
         "modification parameters": ["NT=Carbamidomethyl;AC=UNIMOD:4;TA=C;MT=Fixed"] * len(output_order_df),
         "dissociation method": ["AC=MS:1000422;NT=HCD"] * len(output_order_df),
