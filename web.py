@@ -17,7 +17,7 @@ ms_info_output, sample_info_output= create_sidebar()
 
 
 # Create three tabs
-intro_tab, plate_tab, sample_order, sdrf_tab = st.tabs(["Intro", "Plate Design", "Sample Order", "SDRF"])
+intro_tab, plate_tab, sample_order, evo_tab, sdrf_tab = st.tabs(["Intro", "Plate Design", "Xcalibur", "Evosep", "SDRF"])
 
 with intro_tab:
     intro_detail()
@@ -359,8 +359,8 @@ with sample_order:
     # Store output_order_df in session state for SDRF tab
     st.session_state.output_order_df = output_order_df
     
-    # Convert DataFrame to CSV
-    csv_data = output_with_wash.to_csv(index=False)
+    # Convert DataFrame to CSV with proper encoding
+    csv_data = output_with_wash.to_csv(index=False, encoding='utf-8-sig')
     
     # Add 'Type=4,,,,' to the beginning of the CSV data
     csv_data = 'Bracket Type=4,,,,\n' + csv_data
@@ -379,8 +379,144 @@ with sample_order:
         file_name=sample_order_name,
         mime='csv'
     )
+
+        
         
 
+        
+
+with evo_tab:
+    if ms_info_output['acq_tech'] in ["SRM", "PRM"]:
+    # Evosep method
+            st.markdown("### Evosep method for SRM/PRM")
+            
+            # Output location
+            evosep_output = st.text_input("Enter the directory path to save Evosep method file", uploaded_dir)
+            
+            # Evosep method file
+            evosep_method = st.text_input("Enter the Evosep experiment machine file", "C:\\data\\Evosep\\method.cam")
+            st.markdown(f"The Evosep method file is from: <span style='color:red'>{evosep_method}</span>", unsafe_allow_html=True)  
+            
+            cols = st.columns(3)
+            with cols[0]:
+                st.markdown("### Xcalibur method for SRM/PRM")
+                # Xcalibur iRT method 
+                xcalibur_irt_method = st.text_input("Enter the Xcalibur iRT method file", "C:\\Xcalibur\\methods\\iRT.meth")
+                # st.markdown(f"The Xcalibur iRT method file is from: <span style='color:red'>{xcalibur_irt_method}</span>", unsafe_allow_html=True)
+                
+                # Xcalibur sample SRM/PRM method
+                xcalibur_sample_method = st.text_input("Enter the Xcalibur SRM/PRM method file", "C:\\Xcalibur\\methods\\SRM_PRM.meth")
+                # st.markdown(f"The Xcalibur SRM/PRM method file is from: <span style='color:red'>{xcalibur_sample_method}</span>", unsafe_allow_html=True)
+            with cols[1]:
+                st.markdown("### Evosep standby and prepare command")
+                # Standby command location
+                standby_command = st.text_input("Enter the standby command", "C:\\Xcalibur MS standby.cam")
+                # st.markdown(f"The standby command file is from: <span style='color:red'>{standby_command}</span>", unsafe_allow_html=True)
+                
+                # Prepare command file location for 
+                prepare_command = st.text_input("Enter the prepare command", "C:\\Xcalibur MS prepare.cam")
+                # st.markdown(f"The prepare command file is from: <span style='color:red'>{prepare_command}</span>", unsafe_allow_html=True)
+            with cols[2]:
+                st.markdown("### Evosep slot and comment")
+                # Dropdown evosep_slot 1 to 9
+                evosep_slot = st.selectbox("Select Evosep slot", list(range(1, 10)))
+                # st.markdown(f"The Evosep slot is: <span style='color:red'>{evosep_slot}</span>", unsafe_allow_html=True)
+                # Append EvoLot to evosep_slot
+                evosep_slot = "EvoSlot " + str(evosep_slot)
+                # Comment 
+                evosep_comment = st.text_input("Enter comment for Evosep", "For SRM/PRM analysis")
+
+                # st.markdown(f"The Evosep comment is: <span style='color:red'>{evosep_comment}</span>", unsafe_allow_html=True)
+            
+            ## Create Evosep method file
+
+            evosep_sample_df = plate_df_long.copy()
+
+
+            # Add source vial column with 1 to 96
+            evosep_sample_df['Source Vial'] = list(range(1, evosep_sample_df.shape[0] + 1))
+            # Add 'Xcalibur Method' column
+            evosep_sample_df['Xcalibur Method'] = [xcalibur_sample_method] * evosep_sample_df.shape[0]
+            # Rename File Name to Sample Name
+            evosep_sample_df = evosep_sample_df.rename(columns={"File Name": "Sample Name"})
+
+            # Filter EMPTY wells
+            evosep_sample_df = evosep_sample_df[evosep_sample_df['Sample'] != 'EMPTY']
+
+            # Select only column Sample Name, Xcalibur Method, Source Vial
+            evosep_sample_final = evosep_sample_df[['Source Vial', 'Sample Name', 'Xcalibur Method']]
+
+            ## Create Evosep iRT table
+            # Select total numbers of iRT samples
+            iRT_samples = st.selectbox("Select iRT samples", list(range(1, 10 + 1)), index=2)
+            # iRT sample name 
+            iRT_sample_name = st.text_input("Enter iRT sample name", "iRT_Tag_unscheduled")
+            
+            # Create iRT df
+            evosep_irt_df = pd.DataFrame({
+                # Column Source vial is list from 1 to iRT_samples
+                "Source Vial": list(range(1, iRT_samples + 1)),
+                "Sample Name": [iRT_sample_name] * iRT_samples,
+                "Xcalibur Method": [xcalibur_irt_method] * iRT_samples
+            })
+            
+            # Append source vial to Sample Name
+            evosep_irt_df['Sample Name'] = evosep_irt_df['Sample Name'] + '_' + evosep_irt_df['Source Vial'].astype(str)
+            
+            # Row bind evosep_irt_df before evosep_sample_final
+            evosep_final_df = pd.concat([evosep_irt_df, evosep_sample_final], ignore_index=True)
+
+            # Add first and second column name Analysis Method and Srouce Tray, they are evosep_method and evosep_slot
+            evosep_final_df.insert(0, 'Analysis Method', [evosep_method] * evosep_final_df.shape[0])
+            evosep_final_df.insert(1, 'Source Tray', [evosep_slot] * evosep_final_df.shape[0])
+            
+            # Add prefix to Sample Name with ms_info_output['acq_tech']
+            evosep_final_df['Sample Name'] = ms_info_output['acq_tech'] + '_' + evosep_final_df['Sample Name']
+            
+            # Add Xcalibur file name column with is File Name 
+            evosep_final_df['Xcalibur File Name'] = evosep_final_df['Sample Name']
+            # Add empty column call Xcalibur Post Acquisition Program
+            evosep_final_df['Xcalibur Post Acquisition Program'] = ""
+            
+            # Add Xcalibur output dir called Xcalibur Output Dir
+            evosep_final_df['Xcalibur Output Dir'] = [evosep_output] * evosep_final_df.shape[0]
+            
+            # Add comment 
+            evosep_final_df['Comment'] = [evosep_comment] * evosep_final_df.shape[0]
+            # Add 3 empty columns called  Pump preparation	Align solvents	Flow to column / idle flow
+            evosep_final_df['Pump preparation'] = ""
+            evosep_final_df['Align solvents'] = ""
+            evosep_final_df['Flow to column / idle flow'] = ""
+            
+            # Copy evosep_final_df to evo_Standby_df and remove all contents
+            
+            evo_standby_df = evosep_final_df.copy()
+            evo_standby_df.loc[:, :] = ""
+            # Add standby_command to first row and first column
+            evo_standby_df.iloc[0, 0] = standby_command
+            evo_standby_df.iloc[1, 0] = prepare_command
+            # Add the last three columns of the second riw to be "none", "False", "Idle flow (250 nl/min)"
+            evo_standby_df.iloc[1, -3] = "none"
+            evo_standby_df.iloc[1, -2] = "False"
+            evo_standby_df.iloc[1, -1] = "Idle flow (250 nl/min)"
+            # Ensure that evo_Standby_df has two row and 12 columns
+            evo_standby_df = evo_standby_df.iloc[:2, :12]
+            # Rowbind evo_standby_df after evosep_final_df
+            evosep_final_df = pd.concat([ evosep_final_df, evo_standby_df], ignore_index=True)
+
+            st.write(evosep_final_df)
+            
+            # Add download button for evosep_final_df and separate by ; 
+            evosep_final_name = "_".join([datetime.now().strftime("%Y%m%d"), sample_info_output['proj_name'], "Evosep", "Order", sample_info_output['plate_id']]) + ".csv"
+            csv_evosep_data = evosep_final_df.to_csv(index=True, sep=';', encoding='utf-8-sig')
+            
+            st.download_button(
+                label="Download Evosep order",
+                data=csv_evosep_data,
+                file_name=evosep_final_name,
+                mime='text/csv'
+            )
+            
 with sdrf_tab:
     st.header("SDRF")
     ms_file = st.selectbox("MS file output", ["RAW", "mzML"])
@@ -502,7 +638,7 @@ with sdrf_tab:
     # Download SDRF file
     # fix datetime to YYMMDD
     sdrf_filename = "_".join([datetime.now().strftime("%Y%m%d"), sample_info_output['proj_name'], sample_info_output['plate_id']]) + ".sdrf.tsv"
-    sdrf_tsv = sdrf_df.to_csv(sep='\t', index=False)
+    sdrf_tsv = sdrf_df.to_csv(sep='\t', index=False, encoding='utf-8-sig')
 
     # In sdrf_tsv replace first row where comment[cleavage agent details] with any numbers to just comment[cleavage agent details]
     for i in range(len(ms_info_output['enz_accession_list'])):
