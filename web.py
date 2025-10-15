@@ -474,7 +474,7 @@ with evo_tab:
             evosep_final_df['Sample Name'] = ms_info_output['acq_tech'] + '_' + evosep_final_df['Sample Name']
             
             # Add Xcalibur file name column with is File Name 
-            evosep_final_df['Xcalibur File Name'] = evosep_final_df['Sample Name']
+            evosep_final_df['Xcalibur Filename'] = evosep_final_df['Sample Name']
             # Add empty column call Xcalibur Post Acquisition Program
             evosep_final_df['Xcalibur Post Acquisition Program'] = ""
             
