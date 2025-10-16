@@ -425,7 +425,7 @@ with evo_tab:
             # Append EvoLot to evosep_slot
             evosep_slot = "EvoSlot " + str(evosep_slot)
             # Comment 
-            evosep_comment = st.text_input("Enter comment for Evosep", ms_info_output['acq_tech'] + " analysis")
+            evosep_comment = st.text_input("Enter comment for Evosep", ms_info_output['srm_lot'])
 
             # st.markdown(f"The Evosep comment is: <span style='color:red'>{evosep_comment}</span>", unsafe_allow_html=True)
         
@@ -517,7 +517,7 @@ with evo_tab:
             label="Download Evosep order",
             data=csv_evosep_data.encode('utf-8-sig'),
             file_name=evosep_final_name,
-            mime='text/csv; charset=utf-8'
+            mime='text/csv; charset=utf-8; separator=semicolon'
         )
             
 with sdrf_tab:
