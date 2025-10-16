@@ -183,7 +183,8 @@ with sample_order:
     else:
         st.warning("Please go to the 'Plate Design' tab first to create the plate layout.")
         st.stop()
-    
+
+    plate_df_long['Source Vial'] = list(range(1, plate_df_long.shape[0] + 1))
     # Filter the plate_df_long to only include the samples
     plate_df_long = plate_df_long[plate_df_long['Sample'] != 'EMPTY']
 
@@ -256,9 +257,9 @@ with sample_order:
     plate_df_long['File Name'] = date_injection + "_" + sample_info_output['proj_name'] + "_" + sample_info_output['plate_id'] + "_" + plate_df_long['Position']
     plate_df_long['Position'] =  injection_pos_letter + plate_df_long['Position'] 
     
-    output_order_df = plate_df_long[['File Name', 'Path', 'Instrument Method', 'Position','Inj Vol']]
-    # Remove 'EMPTY' wells from the output_order_df
-    output_order_df = output_order_df[output_order_df['Position'] != 'EMPTY']
+    output_order_df = plate_df_long.copy()
+    output_order_df = output_order_df[['File Name', 'Path', 'Instrument Method', 'Position','Inj Vol']]
+ 
     # Randomize row order
     output_order_df_rand = output_order_df.sample(frac=1).reset_index(drop=True)
     
@@ -359,11 +360,11 @@ with sample_order:
     # Store output_order_df in session state for SDRF tab
     st.session_state.output_order_df = output_order_df
     
-    # Convert DataFrame to CSV with proper encoding
+    # Convert DataFrame to CSV with UTF-8 encoding
     csv_data = output_with_wash.to_csv(index=False, encoding='utf-8-sig')
     
-    # Add 'Type=4,,,,' to the beginning of the CSV data
-    csv_data = 'Bracket Type=4,,,,\n' + csv_data
+    # Add 'Type=4,,,,' to the beginning of the CSV data with proper encoding
+    csv_data = '\ufeff' + 'Bracket Type=4,,,,\n' + csv_data
     
     
     ## Download button for export file
@@ -375,9 +376,9 @@ with sample_order:
     # Download button for output_order_df
     st.download_button(
         label="Download sample order",
-        data=csv_data,
+        data=csv_data.encode('utf-8-sig'),
         file_name=sample_order_name,
-        mime='csv'
+        mime='text/csv; charset=utf-8'
     )
 
         
@@ -431,10 +432,8 @@ with evo_tab:
             ## Create Evosep method file
 
             evosep_sample_df = plate_df_long.copy()
-
-
-            # Add source vial column with 1 to 96
-            evosep_sample_df['Source Vial'] = list(range(1, evosep_sample_df.shape[0] + 1))
+            
+            
             # Add 'Xcalibur Method' column
             evosep_sample_df['Xcalibur Method'] = [xcalibur_sample_method] * evosep_sample_df.shape[0]
             # Rename File Name to Sample Name
@@ -507,14 +506,18 @@ with evo_tab:
             st.write(evosep_final_df)
             
             # Add download button for evosep_final_df and separate by ; 
-            evosep_final_name = "_".join([datetime.now().strftime("%Y%m%d"), sample_info_output['proj_name'], "Evosep", "Order", sample_info_output['plate_id']]) + ".csv"
+            evosep_final_name = "_".join([datetime.now().strftime("%Y%m%d%H%M"), sample_info_output['proj_name'], "Evosep", "Order", sample_info_output['plate_id']]) + ".csv"
             csv_evosep_data = evosep_final_df.to_csv(index=True, sep=';', encoding='utf-8-sig')
+            
+            # Ensure UTF-8 BOM is present
+            if not csv_evosep_data.startswith('\ufeff'):
+                csv_evosep_data = '\ufeff' + csv_evosep_data
             
             st.download_button(
                 label="Download Evosep order",
-                data=csv_evosep_data,
+                data=csv_evosep_data.encode('utf-8-sig'),
                 file_name=evosep_final_name,
-                mime='text/csv'
+                mime='text/csv; charset=utf-8'
             )
             
 with sdrf_tab:
@@ -639,6 +642,10 @@ with sdrf_tab:
     # fix datetime to YYMMDD
     sdrf_filename = "_".join([datetime.now().strftime("%Y%m%d"), sample_info_output['proj_name'], sample_info_output['plate_id']]) + ".sdrf.tsv"
     sdrf_tsv = sdrf_df.to_csv(sep='\t', index=False, encoding='utf-8-sig')
+    
+    # Ensure UTF-8 BOM is present
+    if not sdrf_tsv.startswith('\ufeff'):
+        sdrf_tsv = '\ufeff' + sdrf_tsv
 
     # In sdrf_tsv replace first row where comment[cleavage agent details] with any numbers to just comment[cleavage agent details]
     for i in range(len(ms_info_output['enz_accession_list'])):
@@ -646,7 +653,7 @@ with sdrf_tab:
 
     st.download_button(
         label="Download SDRF",
-        data=sdrf_tsv,
+        data=sdrf_tsv.encode('utf-8-sig'),
         file_name=sdrf_filename,
-        mime='text/tab-separated-values'
+        mime='text/tab-separated-values; charset=utf-8'
     )
