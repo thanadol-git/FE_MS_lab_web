@@ -86,7 +86,7 @@ def ms_info():
     srm_lot = None
     
     # Add SRM/Proteomedge panel
-    if 'SRM' in acq_tech: # If SRM  do 
+    if  acq_tech in ['SRM', 'PRM']: # If SRM  do 
         # acq_tech = "SRM"
         srm_lot = st.sidebar.text_input('ProteomeEdge Lot number: Lot ', "23233")
         if srm_lot: 
