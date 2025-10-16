@@ -494,7 +494,7 @@ with evo_tab:
             # Add standby_command to first row and first column
             evo_standby_df.iloc[0, 0] = standby_command
             evo_standby_df.iloc[1, 0] = prepare_command
-            # Add the last three columns of the second riw to be "none", "False", "Idle flow (250 nl/min)"
+            # Add the last three columns of the second row to be "none", "False", "Idle flow (250 nl/min)"
             evo_standby_df.iloc[1, -3] = "none"
             evo_standby_df.iloc[1, -2] = "False"
             evo_standby_df.iloc[1, -1] = "Idle flow (250 nl/min)"
