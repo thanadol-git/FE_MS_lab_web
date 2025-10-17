@@ -7,15 +7,14 @@ from datetime import datetime
 import plotly.express as px
 
 
-# Split to separate filess
+# Import functions from other modules
 from sidebar import create_sidebar
 from tabs.intro_tab import intro_detail
-from func.plate_plot import plate_dfplot, create_plate_df_long
-# from tabs.plate_tab import plate_design_tab
-# from tabs.sdrf_tab import sdrf_tab
+from func.plate_plot import plate_dfplot, process_plate_positions
+
 
 # Results from Sidebar script
-ms_info_output, sample_info_output= create_sidebar()
+ms_info_output, sample_info_output = create_sidebar()
 
 
 # Create three tabs
@@ -40,66 +39,10 @@ with plate_tab:
     st.write("This is a list of control or pool. Important! The 'EMPTY' will be removed in the later steps.")
     
     example_text = "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1\nCohort_2;RowD\nCohort_2;RowE\nCohort_2;Col9\nCohort_2;Col8"
-    replace_pos = st.text_area("Example Control, Pool or another cohort", example_text).split('\n')
-    # ignore empty lines
-    replace_pos = [item for item in replace_pos if item.strip() != '']
+    text_input = st.text_area("Example Control, Pool or another cohort", example_text)
     
-    # Write warning message if replace_pos does not have ; as one speical character
-    for item in replace_pos:
-        if ';' not in item or item.count(';') != 1 or any(char in item for char in ['?', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '+', '=', '{', '}', '[', ']', '|', '\\', ':', '"', "'", '<', '>', ',', '.', '/', '~','`']):
-            st.warning(f"Invalid format: {item}. It should be like 'Cohort_2;Col8'.")
-            break
-    
-    # Filter row in text that contain 'Col' or 'Row' in replace_pos
-    colrow_label = [item for item in replace_pos if ('Col' in item or 'Row' in item)]
-    # Remove row with 'Col' or 'Row in replace_pos
-    replace_pos = [item for item in replace_pos if not ('Col' in item or 'Row' in item)]
-    
-
-
-    # Check Col and Row then append to replace pos each well
-    for item in colrow_label:
-        if ';' in item:
-            text, pos = item.split(';')
-            # Check if pos is Row and followed by A-H or Col and followed by 1-12
-            if pos.startswith('Row') and len(pos) == 4 and pos[-1] in 'ABCDEFGH':
-                for number in range(1,13):
-                    # Change replace_pos by prepend text + ';' + pos[-1] + str(number) before replace_pos
-                    replace_pos.insert(0, text + ';' + pos[-1] + str(number))
-            elif pos.startswith('Col') and 4 <=len(pos) <= 5 and pos[3:].isdigit() and 1 <= int(pos[3:]) <= 12:
-                for letter in 'ABCDEFGH':
-                    replace_pos.insert(0, text + ';' + letter + pos[3:])
-            else:
-                st.warning(f"Invalid position format: {item}. It should be like 'Cohort_2;RowA' or 'Cohort_2;Col8'.")
-        else:
-            st.warning(f"Invalid format: {item}. It should be like 'Cohort_2;Col8'.")
-
-
-    # Write a  warning message if the position is mentioned more than one time in text area
-    if len(replace_pos) != len(set(replace_pos)):
-        st.warning("Some positions are mentioned more than once. Please check your input.")
-
-    # Check if the position is mentioned more than one time
-    pos_list = []
-    for item in list(set(replace_pos)):
-        if ';' in item:
-            text, pos = item.split(';')
-            pos_list.append(pos)
-    if len(pos_list) != len(set(pos_list)):
-        st.warning("Position is mentioned more than one time with different labels. Possibly, using Row or Col. Please check your input.")
-
-
-    # Ensure the dataframe has 12 columns and 8 rows
-    data = np.resize(sample_info_output['sample_name'], (8, 12))
-    plate_df = pd.DataFrame(data, columns=[str(i) for i in range(1, 13)], index=list('ABCDEFGH'))
-    
-    # Replace text in the dataframe based on replace_pos
-    for item in replace_pos:
-        if ';' in item:
-            text, pos = item.split(';')
-            row = pos[0]
-            col = int(pos[1:]) - 1
-            plate_df.at[row, str(col + 1)] = text
+    # Process plate positions using the function
+    plate_df, replace_pos = process_plate_positions(text_input, sample_info_output['sample_name'])
 
     # header 
     st.subheader("C. Layout of plate")
