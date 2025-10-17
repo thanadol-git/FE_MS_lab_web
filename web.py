@@ -6,6 +6,7 @@ import seaborn as sns
 from datetime import datetime
 import plotly.express as px
 
+
 # Split to separate filess
 from sidebar import create_sidebar
 from tabs.intro_tab import intro_detail
