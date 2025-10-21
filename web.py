@@ -36,8 +36,8 @@ with plate_tab:
 
     # Adding pool or control
     st.subheader("B. Control or Pool")
-    st.write("This is a list of control or pool. Important! The 'EMPTY' will be removed in the later steps.")
-    
+    st.write("Please annotate samples with other cohort besides the main cohort in your plate for example pool samples or control samples. Importantly, The 'EMPTY' wells will be removed in the later steps.")
+
     example_text = "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1\nCohort_2;RowD\nCohort_2;RowE\nCohort_2;Col9\nCohort_2;Col8"
     # Text area for input with example_text 8 rows
     text_input = st.text_area("Example Control, Pool or another cohort", example_text, height=200)
