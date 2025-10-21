@@ -19,7 +19,7 @@ def sample_info():
     # Sample type
     sample = st.sidebar.selectbox("Select your sample type", ["Plasma", "Serum", "Tissue", "Cell line", "Cell culture"], index=0)
     # Plate id 
-    plate_id = st.sidebar.text_input("Enter your plate ID", "")
+    plate_id = st.sidebar.text_input("Enter your plate ID (Barcode)", "")
     # Samplee/ cohort name
     sample_name = st.sidebar.text_input("Main cohort name/abbreviation", "Cohort_1")
     
@@ -136,7 +136,7 @@ def ms_info():
 def create_sidebar():
     
     # Add logo
-    st.sidebar.image("images/logo.png", use_column_width=True)
+    st.sidebar.image("images/logo.png")
 
     # Create a sidebar
     st.sidebar.header("Sample information")
