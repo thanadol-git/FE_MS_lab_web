@@ -6,89 +6,24 @@ import seaborn as sns
 from datetime import datetime
 import plotly.express as px
 
-# Split to separate filess
+
+# Import functions from other modules
 from sidebar import create_sidebar
 from tabs.intro_tab import intro_detail
-# from tabs.plate_tab import plate_design_tab
-# from tabs.sdrf_tab import sdrf_tab
+from func.plate_plot import plate_dfplot, process_plate_positions
+
 
 # Results from Sidebar script
-ms_info_output, sample_info_output= create_sidebar()
+ms_info_output, sample_info_output = create_sidebar()
 
 
 # Create three tabs
-intro_tab, plate_tab, sample_order, evo_tab, sdrf_tab = st.tabs(["Intro", "Plate Design", "Xcalibur", "Evosep", "SDRF"])
+intro_tab, plate_tab, sample_order, sdrf_tab = st.tabs(["Intro", "Plate Design", "Xcalibur",  "SDRF"])
 
 with intro_tab:
     intro_detail()
 
 
-def create_plate_df_long(plate_df): 
-    long_format = plate_df.stack().reset_index()
-    long_format.columns = ['Row', 'Column', 'Sample']
-    return long_format
-
-def plate_dfplot(plate_df, plate_id): 
-    
-    # format plate_df in a long format
-    plate_df_long = create_plate_df_long(plate_df)
-    
-    # Get unique labels sorted alphabetically
-    unique_labels = sorted(plate_df_long['Sample'].unique())
-
-    # Create a custom palette with colors mapped to labels alphabetically
-    custom_palette = dict(zip(unique_labels, sns.color_palette("colorblind", len(unique_labels))))
-
-    
-    fig, ax = plt.subplots()
-    # Create a color palette for discrete text
-
-    # Plot the heatmap with discrete text colors
-    sns.heatmap(plate_df.isnull(), cbar=False, cmap="coolwarm", ax=ax, linewidths=1, linecolor='darkgrey', alpha=0.1)
-    ax.xaxis.tick_top()  # Move the x-axis labels to the top
-    ax.set_yticklabels(ax.get_yticklabels(), rotation=0)  # Fix label rotation on y-axis
-    ax.set_title(plate_id)  # Add title on top
-
-    # Add text annotations and circles with custom colors
-    for i in range(plate_df.shape[0]):
-        for j in range(plate_df.shape[1]):
-            value = plate_df.iloc[i, j]
-            color = custom_palette.get(value, (1, 1, 1))  # Use custom_palette for colors
-            ax.add_patch(plt.Circle((j + 0.5, i + 0.5), 0.4, color=color, fill=True))
-            ax.text(j + 0.5, i + 0.5, f'{value}', ha='center', va='center', color='white', fontsize=4)
-
-    ax.set_yticklabels(plate_df.index, rotation=0)
-
-    # Display the plot
-    st.pyplot(fig)
-    
-    # Plot barplot from labels of plate_df_long['Sample']
-    fig2, ax2 = plt.subplots()
-    sns.countplot(
-        data=plate_df_long, 
-        x='Sample', 
-        ax=ax2, 
-        order=plate_df_long['Sample'].value_counts().index,  # Reorder by count
-        palette=custom_palette  # Apply the custom palette
-    )
-    ax2.set_title(f"Sample count in plate {plate_id}")
-    ax2.set_xlabel(None)
-    ax2.set_ylabel("Count")
-
-    # Add count numbers on top of the bars
-    for p in ax2.patches:
-        ax2.text(
-            p.get_x() + p.get_width() / 2.,  # X-coordinate (center of the bar)
-            p.get_height() + 1,           # Y-coordinate (slightly above the bar)
-            int(p.get_height()),            # Text (bar height)
-            ha='center', va='center', fontsize=10, color='black'  # Text alignment and styling
-        )
-
-    # Display the plot
-    st.pyplot(fig2)
-    
-    # Return the plate_df_long for use in other parts
-    return plate_df_long
 
 with plate_tab:
     st.header("Plate layout new")
@@ -101,72 +36,15 @@ with plate_tab:
 
     # Adding pool or control
     st.subheader("B. Control or Pool")
-    st.write("This is a list of control or pool. Important! The 'EMPTY' will be removed in the later steps.")
-    
+    st.write("Please annotate samples with other cohort besides the main cohort in your plate for example pool samples or control samples. Importantly, The 'EMPTY' wells will be removed in the later steps.")
+
     example_text = "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1\nCohort_2;RowD\nCohort_2;RowE\nCohort_2;Col9\nCohort_2;Col8"
-    replace_pos = st.text_area("Example Control, Pool or another cohort", example_text).split('\n')
-    # ignore empty lines
-    replace_pos = [item for item in replace_pos if item.strip() != '']
+    # Text area for input with example_text 8 rows
+    text_input = st.text_area("Example Control, Pool or another cohort", example_text, height=200)
     
-    # Write warning message if replace_pos does not have ; as one speical character
-    for item in replace_pos:
-        if ';' not in item or item.count(';') != 1 or any(char in item for char in ['?', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '+', '=', '{', '}', '[', ']', '|', '\\', ':', '"', "'", '<', '>', ',', '.', '/', '~','`']):
-            st.warning(f"Invalid format: {item}. It should be like 'Cohort_2;Col8'.")
-            break
-    
-    # Filter row in text that contain 'Col' or 'Row' in replace_pos
-    colrow_label = [item for item in replace_pos if ('Col' in item or 'Row' in item)]
-    # Remove row with 'Col' or 'Row in replace_pos
-    replace_pos = [item for item in replace_pos if not ('Col' in item or 'Row' in item)]
-    
+    # Process plate positions using the function
+    plate_df, replace_pos = process_plate_positions(text_input, sample_info_output['sample_name'])
 
-
-    # Check Col and Row then append to replace pos each well
-    for item in colrow_label:
-        if ';' in item:
-            text, pos = item.split(';')
-            # Check if pos is Row and followed by A-H or Col and followed by 1-12
-            if pos.startswith('Row') and len(pos) == 4 and pos[-1] in 'ABCDEFGH':
-                for number in range(1,13):
-                    replace_pos.append(text + ';' + pos[-1] + str(number))
-            elif pos.startswith('Col') and 4 <=len(pos) <= 5 and pos[3:].isdigit() and 1 <= int(pos[3:]) <= 12:
-                for letter in 'ABCDEFGH':
-                    replace_pos.append(text + ';' + letter + pos[3:])
-            else:
-                st.warning(f"Invalid position format: {item}. It should be like 'Cohort_2;RowA' or 'Cohort_2;Col8'.")
-        else:
-            st.warning(f"Invalid format: {item}. It should be like 'Cohort_2;Col8'.")
-
-
-    # Write a  warning message if the position is mentioned more than one time in text area
-    if len(replace_pos) != len(set(replace_pos)):
-        st.warning("Some positions are mentioned more than once. Please check your input.")
-
-    # Check if the position is mentioned more than one time
-    pos_list = []
-    for item in list(set(replace_pos)):
-        if ';' in item:
-            text, pos = item.split(';')
-            pos_list.append(pos)
-    if len(pos_list) != len(set(pos_list)):
-        st.warning("Position is mentioned more than one time with different labels. Possibly, using Row or Col. Please check your input.")
-
-
-    # Ensure the dataframe has 12 columns and 8 rows
-    data = np.resize(sample_info_output['sample_name'], (8, 12))
-    plate_df = pd.DataFrame(data, columns=[str(i) for i in range(1, 13)], index=list('ABCDEFGH'))
-    
-    # Replace text in the dataframe based on replace_pos
-    for item in replace_pos:
-        if ';' in item:
-            text, pos = item.split(';')
-            row = pos[0]
-            col = int(pos[1:]) - 1
-            plate_df.at[row, str(col + 1)] = text
-
-    ## Comments for checking
-    # st.write(replace_pos)
-    
     # header 
     st.subheader("C. Layout of plate")
     plate_df_long = plate_dfplot(plate_df, sample_info_output['plate_id'])
@@ -183,7 +61,8 @@ with sample_order:
     else:
         st.warning("Please go to the 'Plate Design' tab first to create the plate layout.")
         st.stop()
-    
+
+    plate_df_long['Source Vial'] = list(range(1, plate_df_long.shape[0] + 1))
     # Filter the plate_df_long to only include the samples
     plate_df_long = plate_df_long[plate_df_long['Sample'] != 'EMPTY']
 
@@ -233,11 +112,7 @@ with sample_order:
     method_file = st.text_input("4.Enter the directory path to the method file", "C:\Xcalibur\methods\method1")
     st.markdown(f"The method file for MS is from: <span style='color:red'>{method_file}</span>", unsafe_allow_html=True)
 
-    # Add link to website github.com/thanadol-git/quantms_example/
-    url = "https://www.github.com/thanadol-git/quantms_example/"
-    st.markdown("comment[cleavage agent details'] will be fixed with the downloaded file. Pandas cannot handle two columns with the same name. check out this [link](%s)" % url)
 
-    
     # Date of injection
     date_injection = st.date_input("5.Date of injection", pd.Timestamp("today"))
     # format date_injection to YYYYMMDD as text
@@ -253,12 +128,12 @@ with sample_order:
     # Path column 
     plate_df_long['Path'] = uploaded_dir
     # File name 
-    plate_df_long['File Name'] = date_injection + "_" + sample_info_output['proj_name'] + "_" + sample_info_output['plate_id'] + "_" + plate_df_long['Position']
+    plate_df_long['File Name'] = plate_df_long.apply(lambda row: "_".join([ms_info_output['acq_tech'], date_injection, sample_info_output['proj_name'], sample_info_output['plate_id'], row['Position']]), axis=1)
     plate_df_long['Position'] =  injection_pos_letter + plate_df_long['Position'] 
     
-    output_order_df = plate_df_long[['File Name', 'Path', 'Instrument Method', 'Position','Inj Vol']]
-    # Remove 'EMPTY' wells from the output_order_df
-    output_order_df = output_order_df[output_order_df['Position'] != 'EMPTY']
+    output_order_df = plate_df_long.copy()
+    output_order_df = output_order_df[['File Name', 'Path', 'Instrument Method', 'Position','Inj Vol']]
+ 
     # Randomize row order
     output_order_df_rand = output_order_df.sample(frac=1).reset_index(drop=True)
     
@@ -336,7 +211,7 @@ with sample_order:
     # Download data
 
     ## export order sample name
-    sample_order_name = "_".join([datetime.now().strftime("%Y%m%d%H%M"), sample_info_output['proj_name'], "Sample", "Order", sample_info_output['plate_id']]) + ".csv"
+    sample_order_name = "_".join([ datetime.now().strftime("%Y%m%d%H%M"), sample_info_output['proj_name'], "Sample", "Order", sample_info_output['plate_id']]) + ".csv"
 
     ## export order sample
     ### DIA/DDA plate
@@ -359,11 +234,11 @@ with sample_order:
     # Store output_order_df in session state for SDRF tab
     st.session_state.output_order_df = output_order_df
     
-    # Convert DataFrame to CSV with proper encoding
+    # Convert DataFrame to CSV with UTF-8 encoding
     csv_data = output_with_wash.to_csv(index=False, encoding='utf-8-sig')
     
-    # Add 'Type=4,,,,' to the beginning of the CSV data
-    csv_data = 'Bracket Type=4,,,,\n' + csv_data
+    # Add 'Type=4,,,,' to the beginning of the CSV data with proper encoding
+    csv_data = '\ufeff' + 'Bracket Type=4,,,,\n' + csv_data
     
     
     ## Download button for export file
@@ -375,148 +250,13 @@ with sample_order:
     # Download button for output_order_df
     st.download_button(
         label="Download sample order",
-        data=csv_data,
+        data=csv_data.encode('utf-8-sig'),
         file_name=sample_order_name,
-        mime='csv'
+        mime='text/csv; charset=utf-8'
     )
 
         
         
-
-        
-
-with evo_tab:
-    if ms_info_output['acq_tech'] in ["SRM", "PRM"]:
-    # Evosep method
-            st.markdown("### Evosep method for " + ms_info_output['acq_tech']) 
-            
-            # Output location
-            evosep_output = st.text_input("Enter the directory path to save Evosep method file", uploaded_dir)
-            
-            # Evosep method file
-            evosep_method = st.text_input("Enter the Evosep experiment machine file", "C:\\data\\Evosep\\method.cam")
-            st.markdown(f"The Evosep method file is from: <span style='color:red'>{evosep_method}</span>", unsafe_allow_html=True)  
-            
-            cols = st.columns(3)
-            with cols[0]:
-                st.markdown("### Xcalibur methods")
-                # Xcalibur iRT method 
-                xcalibur_irt_method = st.text_input("Enter the Xcalibur iRT method file", "C:\\Xcalibur\\methods\\iRT.meth")
-                # st.markdown(f"The Xcalibur iRT method file is from: <span style='color:red'>{xcalibur_irt_method}</span>", unsafe_allow_html=True)
-                
-                # Xcalibur sample SRM/PRM method
-                xcalibur_sample_method = st.text_input("Enter the Xcalibur SRM/PRM method file", "C:\\Xcalibur\\methods\\SRM_PRM.meth")
-                # st.markdown(f"The Xcalibur SRM/PRM method file is from: <span style='color:red'>{xcalibur_sample_method}</span>", unsafe_allow_html=True)
-            with cols[1]:
-                st.markdown("### Standby and Prepare Commands")
-                # Standby command location
-                standby_command = st.text_input("Enter the standby command", "C:\\Xcalibur MS standby.cam")
-                # st.markdown(f"The standby command file is from: <span style='color:red'>{standby_command}</span>", unsafe_allow_html=True)
-                
-                # Prepare command file location for 
-                prepare_command = st.text_input("Enter the prepare command", "C:\\Xcalibur MS prepare.cam")
-                # st.markdown(f"The prepare command file is from: <span style='color:red'>{prepare_command}</span>", unsafe_allow_html=True)
-            with cols[2]:
-                st.markdown("### Evosep slot and comment")
-                # Dropdown evosep_slot 1 to 9
-                evosep_slot = st.selectbox("Select Evosep slot", list(range(1, 10)))
-                # st.markdown(f"The Evosep slot is: <span style='color:red'>{evosep_slot}</span>", unsafe_allow_html=True)
-                # Append EvoLot to evosep_slot
-                evosep_slot = "EvoSlot " + str(evosep_slot)
-                # Comment 
-                evosep_comment = st.text_input("Enter comment for Evosep", ms_info_output['acq_tech'] + " analysis")
-
-                # st.markdown(f"The Evosep comment is: <span style='color:red'>{evosep_comment}</span>", unsafe_allow_html=True)
-            
-            ## Create Evosep method file
-
-            evosep_sample_df = plate_df_long.copy()
-
-
-            # Add source vial column with 1 to 96
-            evosep_sample_df['Source Vial'] = list(range(1, evosep_sample_df.shape[0] + 1))
-            # Add 'Xcalibur Method' column
-            evosep_sample_df['Xcalibur Method'] = [xcalibur_sample_method] * evosep_sample_df.shape[0]
-            # Rename File Name to Sample Name
-            evosep_sample_df = evosep_sample_df.rename(columns={"File Name": "Sample Name"})
-
-            # Filter EMPTY wells
-            evosep_sample_df = evosep_sample_df[evosep_sample_df['Sample'] != 'EMPTY']
-
-            # Select only column Sample Name, Xcalibur Method, Source Vial
-            evosep_sample_final = evosep_sample_df[['Source Vial', 'Sample Name', 'Xcalibur Method']]
-
-            ## Create Evosep iRT table
-            # Select total numbers of iRT samples
-            iRT_samples = st.selectbox("Select iRT samples", list(range(1, 10 + 1)), index=2)
-            # iRT sample name 
-            iRT_sample_name = st.text_input("Enter iRT sample name", "iRT_Tag_unscheduled")
-            
-            # Create iRT df
-            evosep_irt_df = pd.DataFrame({
-                # Column Source vial is list from 1 to iRT_samples
-                "Source Vial": list(range(1, iRT_samples + 1)),
-                "Sample Name": [iRT_sample_name] * iRT_samples,
-                "Xcalibur Method": [xcalibur_irt_method] * iRT_samples
-            })
-            
-            # Append source vial to Sample Name
-            evosep_irt_df['Sample Name'] = evosep_irt_df['Sample Name'] + '_' + evosep_irt_df['Source Vial'].astype(str)
-            
-            # Row bind evosep_irt_df before evosep_sample_final
-            evosep_final_df = pd.concat([evosep_irt_df, evosep_sample_final], ignore_index=True)
-
-            # Add first and second column name Analysis Method and Srouce Tray, they are evosep_method and evosep_slot
-            evosep_final_df.insert(0, 'Analysis Method', [evosep_method] * evosep_final_df.shape[0])
-            evosep_final_df.insert(1, 'Source Tray', [evosep_slot] * evosep_final_df.shape[0])
-            
-            # Add prefix to Sample Name with ms_info_output['acq_tech']
-            evosep_final_df['Sample Name'] = ms_info_output['acq_tech'] + '_' + evosep_final_df['Sample Name']
-            
-            # Add Xcalibur file name column with is File Name 
-            evosep_final_df['Xcalibur Filename'] = evosep_final_df['Sample Name']
-            # Add empty column call Xcalibur Post Acquisition Program
-            evosep_final_df['Xcalibur Post Acquisition Program'] = ""
-            
-            # Add Xcalibur output dir called Xcalibur Output Dir
-            evosep_final_df['Xcalibur Output Dir'] = [evosep_output] * evosep_final_df.shape[0]
-            
-            # Add comment 
-            evosep_final_df['Comment'] = [evosep_comment] * evosep_final_df.shape[0]
-            # Add 3 empty columns called  Pump preparation	Align solvents	Flow to column / idle flow
-            evosep_final_df['Pump preparation'] = ""
-            evosep_final_df['Align solvents'] = ""
-            evosep_final_df['Flow to column / idle flow'] = ""
-            
-            # Copy evosep_final_df to evo_Standby_df and remove all contents
-            
-            evo_standby_df = evosep_final_df.copy()
-            evo_standby_df.loc[:, :] = ""
-            # Add standby_command to first row and first column
-            evo_standby_df.iloc[0, 0] = standby_command
-            evo_standby_df.iloc[1, 0] = prepare_command
-            # Add the last three columns of the second riw to be "none", "False", "Idle flow (250 nl/min)"
-            evo_standby_df.iloc[1, -3] = "none"
-            evo_standby_df.iloc[1, -2] = "False"
-            evo_standby_df.iloc[1, -1] = "Idle flow (250 nl/min)"
-            # Ensure that evo_Standby_df has two row and 12 columns
-            evo_standby_df = evo_standby_df.iloc[:2, :12]
-            # Rowbind evo_standby_df after evosep_final_df
-            evosep_final_df = pd.concat([ evosep_final_df, evo_standby_df], ignore_index=True)
-
-            st.write(evosep_final_df)
-            
-            # Add download button for evosep_final_df and separate by ; 
-            evosep_final_name = "_".join([datetime.now().strftime("%Y%m%d"), sample_info_output['proj_name'], "Evosep", "Order", sample_info_output['plate_id']]) + ".csv"
-            csv_evosep_data = evosep_final_df.to_csv(index=True, sep=';', encoding='utf-8-sig')
-            
-            st.download_button(
-                label="Download Evosep order",
-                data=csv_evosep_data,
-                file_name=evosep_final_name,
-                mime='text/csv'
-            )
-            
 with sdrf_tab:
     st.header("SDRF")
     ms_file = st.selectbox("MS file output", ["RAW", "mzML"])
@@ -639,6 +379,10 @@ with sdrf_tab:
     # fix datetime to YYMMDD
     sdrf_filename = "_".join([datetime.now().strftime("%Y%m%d"), sample_info_output['proj_name'], sample_info_output['plate_id']]) + ".sdrf.tsv"
     sdrf_tsv = sdrf_df.to_csv(sep='\t', index=False, encoding='utf-8-sig')
+    
+    # Ensure UTF-8 BOM is present
+    if not sdrf_tsv.startswith('\ufeff'):
+        sdrf_tsv = '\ufeff' + sdrf_tsv
 
     # In sdrf_tsv replace first row where comment[cleavage agent details] with any numbers to just comment[cleavage agent details]
     for i in range(len(ms_info_output['enz_accession_list'])):
@@ -646,7 +390,13 @@ with sdrf_tab:
 
     st.download_button(
         label="Download SDRF",
-        data=sdrf_tsv,
+        data=sdrf_tsv.encode('utf-8-sig'),
         file_name=sdrf_filename,
-        mime='text/tab-separated-values'
+        mime='text/tab-separated-values; charset=utf-8'
     )
+
+    # Add link to website github.com/thanadol-git/quantms_example/
+    url = "https://www.github.com/thanadol-git/quantms_example/"
+    st.markdown("comment[cleavage agent details'] will be fixed with the downloaded file. Pandas cannot handle two columns with the same name. check out this [link](%s)" % url)
+
+    

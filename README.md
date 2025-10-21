@@ -7,9 +7,11 @@
 SDRF
 - [x] DDA 
 - [x] DIA 
-- [ ] SRM : To discuss with David
-- [ ] Vanquish : To discuss with David
+- [x] SRM : To discuss with David
+- [x] Vanquish : To discuss with David
 - [] sample prep : To discuss with David
+- [] Hamilton : To discuss with David
+
 
  
 

@@ -1,0 +1,16 @@
+[theme]
+# Primary colors
+primaryColor = "#3e6c8dff"  # Red accent color for buttons, sliders, etc.
+backgroundColor = "#FFFFFF"  # White background
+secondaryBackgroundColor = "#F0F2F6"  # Light gray for sidebar and containers
+textColor = "#262730"  # Dark text
+
+# Base theme (can be "light" or "dark")
+base = "light"
+
+# Font family
+font = "sans serif"  # Options: "sans serif", "serif", "monospace"
+
+[server]
+headless = true
+enableCORS = false

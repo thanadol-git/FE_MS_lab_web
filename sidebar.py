@@ -19,7 +19,7 @@ def sample_info():
     # Sample type
     sample = st.sidebar.selectbox("Select your sample type", ["Plasma", "Serum", "Tissue", "Cell line", "Cell culture"], index=0)
     # Plate id 
-    plate_id = st.sidebar.text_input("Enter your plate ID", "")
+    plate_id = st.sidebar.text_input("Enter your plate ID (Barcode)", "")
     # Samplee/ cohort name
     sample_name = st.sidebar.text_input("Main cohort name/abbreviation", "Cohort_1")
     
@@ -86,7 +86,7 @@ def ms_info():
     srm_lot = None
     
     # Add SRM/Proteomedge panel
-    if 'SRM' in acq_tech: # If SRM  do 
+    if  acq_tech in ['SRM', 'PRM']: # If SRM  do 
         # acq_tech = "SRM"
         srm_lot = st.sidebar.text_input('ProteomeEdge Lot number: Lot ', "23233")
         if srm_lot: 
@@ -134,6 +134,10 @@ def ms_info():
     return ms_info_output
 
 def create_sidebar():
+    
+    # Add logo
+    st.sidebar.image("images/logo.png")
+
     # Create a sidebar
     st.sidebar.header("Sample information")
     st.sidebar.write("This part is needed for every file that we are creating.")
