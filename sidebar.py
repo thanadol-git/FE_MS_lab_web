@@ -134,6 +134,10 @@ def ms_info():
     return ms_info_output
 
 def create_sidebar():
+    
+    # Add logo
+    st.sidebar.image("images/logo.png", use_column_width=True)
+
     # Create a sidebar
     st.sidebar.header("Sample information")
     st.sidebar.write("This part is needed for every file that we are creating.")
