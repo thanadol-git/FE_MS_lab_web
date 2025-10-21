@@ -388,7 +388,7 @@ with sample_order:
 with evo_tab:
     if ms_info_output['acq_tech'] in ["SRM", "PRM"]:
     # Evosep method
-            st.markdown("### Evosep method for SRM/PRM")
+            st.markdown("### Evosep method for " + ms_info_output['acq_tech']) 
             
             # Output location
             evosep_output = st.text_input("Enter the directory path to save Evosep method file", uploaded_dir)
@@ -399,7 +399,7 @@ with evo_tab:
             
             cols = st.columns(3)
             with cols[0]:
-                st.markdown("### Xcalibur method for SRM/PRM")
+                st.markdown("### Xcalibur methods")
                 # Xcalibur iRT method 
                 xcalibur_irt_method = st.text_input("Enter the Xcalibur iRT method file", "C:\\Xcalibur\\methods\\iRT.meth")
                 # st.markdown(f"The Xcalibur iRT method file is from: <span style='color:red'>{xcalibur_irt_method}</span>", unsafe_allow_html=True)
@@ -408,7 +408,7 @@ with evo_tab:
                 xcalibur_sample_method = st.text_input("Enter the Xcalibur SRM/PRM method file", "C:\\Xcalibur\\methods\\SRM_PRM.meth")
                 # st.markdown(f"The Xcalibur SRM/PRM method file is from: <span style='color:red'>{xcalibur_sample_method}</span>", unsafe_allow_html=True)
             with cols[1]:
-                st.markdown("### Evosep standby and prepare command")
+                st.markdown("### Standby and Prepare Commands")
                 # Standby command location
                 standby_command = st.text_input("Enter the standby command", "C:\\Xcalibur MS standby.cam")
                 # st.markdown(f"The standby command file is from: <span style='color:red'>{standby_command}</span>", unsafe_allow_html=True)
@@ -424,7 +424,7 @@ with evo_tab:
                 # Append EvoLot to evosep_slot
                 evosep_slot = "EvoSlot " + str(evosep_slot)
                 # Comment 
-                evosep_comment = st.text_input("Enter comment for Evosep", "For SRM/PRM analysis")
+                evosep_comment = st.text_input("Enter comment for Evosep", ms_info_output['acq_tech'] + " analysis")
 
                 # st.markdown(f"The Evosep comment is: <span style='color:red'>{evosep_comment}</span>", unsafe_allow_html=True)
             
@@ -474,7 +474,7 @@ with evo_tab:
             evosep_final_df['Sample Name'] = ms_info_output['acq_tech'] + '_' + evosep_final_df['Sample Name']
             
             # Add Xcalibur file name column with is File Name 
-            evosep_final_df['Xcalibur File Name'] = evosep_final_df['Sample Name']
+            evosep_final_df['Xcalibur Filename'] = evosep_final_df['Sample Name']
             # Add empty column call Xcalibur Post Acquisition Program
             evosep_final_df['Xcalibur Post Acquisition Program'] = ""
             
