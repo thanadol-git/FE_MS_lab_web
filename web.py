@@ -18,7 +18,7 @@ ms_info_output, sample_info_output = create_sidebar()
 
 
 # Create three tabs
-intro_tab, plate_tab, sample_order, evo_tab, sdrf_tab = st.tabs(["Intro", "Plate Design", "Xcalibur", "Evosep", "SDRF"])
+intro_tab, plate_tab, sample_order, evo_tab, sdrf_tab = st.tabs(["Intro", "Plate Design", "Xcalibur", "Chronos", "SDRF"])
 
 with intro_tab:
     intro_detail()
@@ -255,13 +255,10 @@ with sample_order:
         mime='text/csv; charset=utf-8'
     )
 
-        
-        
 
-        
 
 with evo_tab:
-    if ms_info_output['acq_tech'] in ["SRM", "PRM"]:
+    if ms_info_output['machine'] == "LIT Stellar":
         # Evosep method
         st.markdown("### Evosep method for " + ms_info_output['acq_tech']) 
         
