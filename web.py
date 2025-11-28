@@ -276,9 +276,9 @@ with evo_tab:
         evosep_method = st.text_input("Enter the Evosep experiment machine file", "C:\\data\\Evosep\\method.cam")
         st.markdown(f"The Evosep method file is from: <span style='color:red'>{evosep_method}</span>", unsafe_allow_html=True)  
         
-        #  Randomize button
+        # Create a tick box for randomizing sample order
         randomize_checkbox_chronos = st.checkbox("Randomize sample order")
-        
+
         cols = st.columns(3)
         with cols[0]:
             st.markdown("### Xcalibur methods")
@@ -331,14 +331,15 @@ with evo_tab:
         iRT_samples = st.selectbox("Select iRT samples", list(range(0, 10 + 1)), index=2)
         
                 
-        # Create a tick box for randomizing sample order
         
-        # if randomize_checkbox == True:
-        #     evosep_sample_final = evosep_sample_df.sample(frac=1).reset_index(drop=True)
-        #     st.success("Sample order randomized!")
-        # else:
-        #     evosep_sample_final = evosep_sample_df.copy()
-        evosep_sample_final = evosep_sample_df.copy()
+        
+        if randomize_checkbox_chronos == True:
+            evosep_sample_final = evosep_sample_df.sample(frac=1).reset_index(drop=True)
+            st.success("Sample order randomized!")
+        else:
+            evosep_sample_final = evosep_sample_df.copy()
+        
+        # evosep_sample_final = evosep_sample_df.copy()
         # iRT sample name 
         if iRT_samples != 0:
             iRT_sample_name = st.text_input("Enter iRT sample name", "iRT_Tag_unscheduled")
@@ -358,7 +359,7 @@ with evo_tab:
         else:
             evosep_final_df = evosep_sample_final
 
-
+        st.markdown("### Download Chronos File")
 
 
         # Add first and second column name Analysis Method and Srouce Tray, they are evosep_method and evosep_slot
