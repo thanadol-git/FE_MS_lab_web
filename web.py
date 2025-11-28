@@ -267,7 +267,7 @@ with sample_order:
 with evo_tab:
     if ms_info_output['machine'] == "LIT Stellar":
         # Evosep method
-        st.markdown("Evosep method for " + ms_info_output['acq_tech']) 
+        st.header("Evosep method for " + ms_info_output['acq_tech']) 
         
         # Output location
         evosep_output = st.text_input("Enter the directory path to save Evosep method file", uploaded_dir)
