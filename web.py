@@ -301,7 +301,7 @@ with evo_tab:
         with cols[2]:
             st.markdown("### Evosep slot and comment")
             # Dropdown evosep_slot 1 to 9
-            evosep_slot = st.selectbox("Select Evosep slot", list(range(1, 10)))
+            evosep_slot = st.selectbox("Select Evosep slot", list(range(1, 6)))
             # st.markdown(f"The Evosep slot is: <span style='color:red'>{evosep_slot}</span>", unsafe_allow_html=True)
             # Append EvoLot to evosep_slot
             evosep_slot = "EvoSlot " + str(evosep_slot)
