@@ -318,23 +318,37 @@ with evo_tab:
 
         ## Create Evosep iRT table
         # Select total numbers of iRT samples
-        iRT_samples = st.selectbox("Select iRT samples", list(range(1, 10 + 1)), index=2)
+        iRT_samples = st.selectbox("Select iRT samples", list(range(0, 10 + 1)), index=2)
+        
+                
+        # Create a tick box for randomizing sample order
+        randomize_checkbox = st.checkbox("Randomize sample order")
+        
+        if randomize_checkbox == True:
+            evosep_sample_final = evosep_sample_final.sample(frac=1).reset_index(drop=True)
+            st.success("Sample order randomized!")
+            
         # iRT sample name 
-        iRT_sample_name = st.text_input("Enter iRT sample name", "iRT_Tag_unscheduled")
-        
-        # Create iRT df
-        evosep_irt_df = pd.DataFrame({
-            # Column Source vial is list from 1 to iRT_samples
-            "Source Vial": list(range(1, iRT_samples + 1)),
-            "Sample Name": [iRT_sample_name] * iRT_samples,
-            "Xcalibur Method": [xcalibur_irt_method] * iRT_samples
-        })
-        
-        # Append source vial to Sample Name
-        evosep_irt_df['Sample Name'] = evosep_irt_df['Sample Name'] + '_' + evosep_irt_df['Source Vial'].astype(str)
-        
-        # Row bind evosep_irt_df before evosep_sample_final
-        evosep_final_df = pd.concat([evosep_irt_df, evosep_sample_final], ignore_index=True)
+        if iRT_samples != 0:
+            iRT_sample_name = st.text_input("Enter iRT sample name", "iRT_Tag_unscheduled")
+            
+            # Create iRT df
+            evosep_irt_df = pd.DataFrame({
+                # Column Source vial is list from 1 to iRT_samples
+                "Source Vial": list(range(1, iRT_samples + 1)),
+                "Sample Name": [iRT_sample_name] * iRT_samples,
+                "Xcalibur Method": [xcalibur_irt_method] * iRT_samples
+            })
+            
+             # Append source vial to Sample Name
+            evosep_irt_df['Sample Name'] = evosep_irt_df['Sample Name'] + '_' + evosep_irt_df['Source Vial'].astype(str)
+            # Final Evosep df
+            evosep_final_df = pd.concat([evosep_irt_df, evosep_sample_final], ignore_index=True)
+        else:
+            evosep_final_df = evosep_sample_final
+
+
+
 
         # Add first and second column name Analysis Method and Srouce Tray, they are evosep_method and evosep_slot
         evosep_final_df.insert(0, 'Analysis Method', [evosep_method] * evosep_final_df.shape[0])
