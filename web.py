@@ -134,8 +134,6 @@ with sample_order:
     output_order_df = plate_df_long.copy()
     output_order_df = output_order_df[['File Name', 'Path', 'Instrument Method', 'Position','Inj Vol']]
  
-    # Randomize row order
-    output_order_df_rand = output_order_df.sample(frac=1).reset_index(drop=True)
     
     # QC standard and washes 
     cols = st.columns(3)
@@ -209,6 +207,15 @@ with sample_order:
         qc_between_df_post = qc_between_df_post.reset_index(drop=True)
 
     # Download data
+    
+    # Add randomized sample order tickbox
+    randomize_checkbox = st.checkbox("Randomize sample order")
+    
+    if randomize_checkbox == True:
+        st.success("Sample order randomized!")
+        output_order_df_rand = output_order_df.sample(frac=1).reset_index(drop=True)
+    else:
+        output_order_df_rand = output_order_df.copy()
 
     ## export order sample name
     sample_order_name = "_".join([ datetime.now().strftime("%Y%m%d%H%M"), sample_info_output['proj_name'], "Sample", "Order", sample_info_output['plate_id']]) + ".csv"
@@ -245,7 +252,7 @@ with sample_order:
     st.markdown("### Download data")
     
     st.markdown("The data below is an example for sample order in Xcalibur. The injection order will be randomized and added with wash and qc standard. Be sure with SRM injection")
-    st.write(output_order_df)
+    st.write(output_order_df_rand)
     st.markdown("Click below to download the data.") 
     # Download button for output_order_df
     st.download_button(
