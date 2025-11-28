@@ -402,19 +402,19 @@ with evo_tab:
 
         st.write(evosep_final_df)
         
-        # Add download button for evosep_final_df and separate by ; 
-        evosep_final_name = "_".join([datetime.now().strftime("%Y%m%d%H%M"), sample_info_output['proj_name'], "Evosep", "Order", sample_info_output['plate_id']]) + ".csv"
-        csv_evosep_data = evosep_final_df.to_csv(index=True, sep=';', encoding='utf-8-sig')
+        # Add download button for evosep_final_df as XML
+        # Replace invalid XML tag characters in column names
+        evosep_xml_df = evosep_final_df.copy()
+        evosep_xml_df.columns = [col.replace(' ', '_').replace('/', '_').replace('(', '').replace(')', '') for col in evosep_xml_df.columns]
         
-        # Ensure UTF-8 BOM is present
-        if not csv_evosep_data.startswith('\ufeff'):
-            csv_evosep_data = '\ufeff' + csv_evosep_data
+        evosep_final_name = "_".join([datetime.now().strftime("%Y%m%d%H%M"), sample_info_output['proj_name'], "Evosep", "Order", sample_info_output['plate_id']]) + ".xml"
+        xml_evosep_data = evosep_xml_df.to_xml(index=True)
         
         st.download_button(
             label="Download Evosep order",
-            data=csv_evosep_data.encode('utf-8-sig'),
+            data=xml_evosep_data.encode('utf-8'),
             file_name=evosep_final_name,
-            mime='text/csv; charset=utf-8; separator=semicolon'
+            mime='application/xml'
         )
             
 with sdrf_tab:
