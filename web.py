@@ -207,11 +207,12 @@ with sample_order:
         qc_between_df_post = qc_between_df_post.reset_index(drop=True)
 
     # Download data
-    
+    st.markdown("### Download data")
+
     # Add randomized sample order tickbox
-    randomize_checkbox = st.checkbox("Randomize sample order")
+    randomize_checkbox_xcalibur = st.checkbox("Randomize sample order", key="randomize_xcalibur")
     
-    if randomize_checkbox == True:
+    if randomize_checkbox_xcalibur == True:
         st.success("Sample order randomized!")
         output_order_df_rand = output_order_df.sample(frac=1).reset_index(drop=True)
     else:
@@ -249,7 +250,6 @@ with sample_order:
     
     
     ## Download button for export file
-    st.markdown("### Download data")
     
     st.markdown("The data below is an example for sample order in Xcalibur. The injection order will be randomized and added with wash and qc standard. Be sure with SRM injection")
     st.write(output_order_df_rand)
@@ -275,6 +275,9 @@ with evo_tab:
         # Evosep method file
         evosep_method = st.text_input("Enter the Evosep experiment machine file", "C:\\data\\Evosep\\method.cam")
         st.markdown(f"The Evosep method file is from: <span style='color:red'>{evosep_method}</span>", unsafe_allow_html=True)  
+        
+        #  Randomize button
+        randomize_checkbox_chronos = st.checkbox("Randomize sample order")
         
         cols = st.columns(3)
         with cols[0]:
@@ -321,7 +324,7 @@ with evo_tab:
         evosep_sample_df = evosep_sample_df[evosep_sample_df['Sample'] != 'EMPTY']
 
         # Select only column Sample Name, Xcalibur Method, Source Vial
-        evosep_sample_final = evosep_sample_df[['Source Vial', 'Sample Name', 'Xcalibur Method']]
+        evosep_sample_df = evosep_sample_df[['Source Vial', 'Sample Name', 'Xcalibur Method']]
 
         ## Create Evosep iRT table
         # Select total numbers of iRT samples
@@ -329,12 +332,13 @@ with evo_tab:
         
                 
         # Create a tick box for randomizing sample order
-        randomize_checkbox = st.checkbox("Randomize sample order")
         
-        if randomize_checkbox == True:
-            evosep_sample_final = evosep_sample_final.sample(frac=1).reset_index(drop=True)
-            st.success("Sample order randomized!")
-            
+        # if randomize_checkbox == True:
+        #     evosep_sample_final = evosep_sample_df.sample(frac=1).reset_index(drop=True)
+        #     st.success("Sample order randomized!")
+        # else:
+        #     evosep_sample_final = evosep_sample_df.copy()
+        evosep_sample_final = evosep_sample_df.copy()
         # iRT sample name 
         if iRT_samples != 0:
             iRT_sample_name = st.text_input("Enter iRT sample name", "iRT_Tag_unscheduled")
