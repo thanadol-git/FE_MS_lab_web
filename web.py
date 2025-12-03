@@ -285,7 +285,7 @@ with evo_tab:
         st.markdown(f"The Xcalibur SRM/PRM method file is from: <span style='color:red'>{xcalibur_sample_method}</span>", unsafe_allow_html=True)
 
         # Dropdown evosep_slot 1 to 6
-        evosep_slot = st.selectbox("Select Evosep slot", list(range(1, 6)))
+        evosep_slot = st.selectbox("Select Evosep slot", list(range(1, 7)))
         # st.markdown(f"The Evosep slot is: <span style='color:red'>{evosep_slot}</span>", unsafe_allow_html=True)
         # Append EvoLot to evosep_slot
         evosep_slot = "EvoSlot " + str(evosep_slot)
@@ -321,7 +321,7 @@ with evo_tab:
         
         cols = st.columns(2)
         with cols[0]:
-            st.markdown("### Xcalibur methods")
+            st.markdown("### Pre-run: Xcalibur methods")
             
             # Tickbox for including iRT method
             include_irt_method = st.checkbox("Include iRT method", value=False)
@@ -341,7 +341,7 @@ with evo_tab:
 
             
         with cols[1]:
-            st.markdown("### Standby and Prepare Commands")
+            st.markdown("### Post-run: Standby and Prepare Commands")
             
             # Tickbox for including standby and prepare commands
             include_standby_prepare = st.checkbox("Include Standby and Prepare commands", value=False)
@@ -405,21 +405,25 @@ with evo_tab:
         evosep_final_df['Align solvents'] = ""
         evosep_final_df['Flow to column / idle flow'] = ""
         
-        # Copy evosep_final_df to evo_Standby_df and remove all contents
-        
-        evo_standby_df = evosep_final_df.copy()
-        evo_standby_df.loc[:, :] = ""
-        # Add standby_command to first row and first column
-        evo_standby_df.iloc[0, 0] = standby_command
-        evo_standby_df.iloc[1, 0] = prepare_command
-        # Add the last three columns of the second row to be "none", "False", "Idle flow (250 nl/min)"
-        evo_standby_df.iloc[1, -3] = "none"
-        evo_standby_df.iloc[1, -2] = "False"
-        evo_standby_df.iloc[1, -1] = "Idle flow (250 nl/min)"
-        # Ensure that evo_Standby_df has two row and 12 columns
-        evo_standby_df = evo_standby_df.iloc[:2, :12]
-        # Rowbind evo_standby_df after evosep_final_df
-        evosep_final_df = pd.concat([ evosep_final_df, evo_standby_df], ignore_index=True)
+        if include_standby_prepare:
+                
+            # Copy evosep_final_df to evo_Standby_df and remove all contents
+            
+            evo_standby_df = evosep_final_df.copy()
+            evo_standby_df.loc[:, :] = ""
+            # Add standby_command to first row and first column
+            evo_standby_df.iloc[0, 0] = standby_command
+            evo_standby_df.iloc[1, 0] = prepare_command
+            # Add the last three columns of the second row to be "none", "False", "Idle flow (250 nl/min)"
+            evo_standby_df.iloc[1, -3] = "none"
+            evo_standby_df.iloc[1, -2] = "False"
+            evo_standby_df.iloc[1, -1] = "Idle flow (250 nl/min)"
+            # Ensure that evo_Standby_df has two row and 12 columns
+            evo_standby_df = evo_standby_df.iloc[:2, :12]
+            # Rowbind evo_standby_df after evosep_final_df
+            evosep_final_df = pd.concat([ evosep_final_df, evo_standby_df], ignore_index=True)
+        else:
+            pass
 
         st.write(evosep_final_df)
         
@@ -447,7 +451,17 @@ with evo_tab:
             evosep_xml_df.columns = [col.replace(' ', '_').replace('/', '_').replace('(', '').replace(')', '') for col in evosep_xml_df.columns]
             
             evosep_xml_name = "_".join([datetime.now().strftime("%Y%m%d%H%M"), sample_info_output['proj_name'], "Evosep", "Order", sample_info_output['plate_id']]) + ".xml"
-            xml_evosep_data = evosep_xml_df.to_xml(index=True)
+            
+            # Generate XML using ElementTree and minidom
+            root = ET.Element('data')
+            for idx, row in evosep_xml_df.iterrows():
+                row_elem = ET.SubElement(root, 'row')
+                for col_name, value in row.items():
+                    col_elem = ET.SubElement(row_elem, col_name)
+                    col_elem.text = str(value)
+            
+            xml_str = minidom.parseString(ET.tostring(root)).toprettyxml(indent="  ")
+            xml_evosep_data = xml_str
             
             st.download_button(
                 label="⬇️ Download XML",
