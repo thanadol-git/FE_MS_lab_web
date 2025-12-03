@@ -269,10 +269,16 @@ with evo_tab:
         
         # Output location
         evosep_output = st.text_input("Enter the directory path to save Evosep method file", uploaded_dir)
+        st.markdown(f"The data will be saved at: <span style='color:red'>{evosep_output}</span>", unsafe_allow_html=True)
         
         # Evosep method file
         evosep_method = st.text_input("Enter the Evosep experiment machine file (.cam)", "C:\\data\\Evosep\\method.cam")
         st.markdown(f"The Evosep method file is from: <span style='color:red'>{evosep_method}</span>", unsafe_allow_html=True)  
+        
+        # Xcalibur iRT method 
+        xcalibur_irt_method = st.text_input("Enter the Xcalibur iRT method file", "C:\\Xcalibur\\methods\\iRT.meth")
+        st.markdown(f"The Xcalibur iRT method file is from: <span style='color:red'>{xcalibur_irt_method}</span>", unsafe_allow_html=True)
+
         
         # Dropdown evosep_slot 1 to 6
         evosep_slot = st.selectbox("Select Evosep slot", list(range(1, 6)))
@@ -291,15 +297,20 @@ with evo_tab:
         cols = st.columns(2)
         with cols[0]:
             st.markdown("### Xcalibur methods")
-            # Xcalibur iRT method 
-            xcalibur_irt_method = st.text_input("Enter the Xcalibur iRT method file", "C:\\Xcalibur\\methods\\iRT.meth")
-            # st.markdown(f"The Xcalibur iRT method file is from: <span style='color:red'>{xcalibur_irt_method}</span>", unsafe_allow_html=True)
+            
+            # Tickbox for including iRT method
+            # Xcalibur iRT method
+            include_irt_method = st.checkbox("Include iRT method", value=True)
             
             # Xcalibur sample SRM/PRM method
             xcalibur_sample_method = st.text_input("Enter the Xcalibur SRM/PRM method file", "C:\\Xcalibur\\methods\\SRM_PRM.meth")
             # st.markdown(f"The Xcalibur SRM/PRM method file is from: <span style='color:red'>{xcalibur_sample_method}</span>", unsafe_allow_html=True)
         with cols[1]:
             st.markdown("### Standby and Prepare Commands")
+            
+            # Tickbox for including standby and prepare commands
+            include_standby_prepare = st.checkbox("Include Standby and Prepare commands", value=True
+            
             # Standby command location
             standby_command = st.text_input("Enter the standby command", "C:\\Xcalibur MS standby.cam")
             # st.markdown(f"The standby command file is from: <span style='color:red'>{standby_command}</span>", unsafe_allow_html=True)
