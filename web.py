@@ -1,10 +1,8 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 from datetime import datetime
-import plotly.express as px
+import xml.etree.ElementTree as ET
+from xml.dom import minidom
 
 
 # Import functions from other modules
@@ -426,7 +424,17 @@ with evo_tab:
             evosep_xml_df.columns = [col.replace(' ', '_').replace('/', '_').replace('(', '').replace(')', '') for col in evosep_xml_df.columns]
             
             evosep_xml_name = "_".join([datetime.now().strftime("%Y%m%d%H%M"), sample_info_output['proj_name'], "Evosep", "Order", sample_info_output['plate_id']]) + ".xml"
-            xml_evosep_data = evosep_xml_df.to_xml(index=True)
+            
+            # Generate XML from DataFrame
+            root = ET.Element('data')
+            for idx, row in evosep_xml_df.iterrows():
+                row_elem = ET.SubElement(root, 'row')
+                row_elem.set('index', str(idx))
+                for col, value in row.items():
+                    col_elem = ET.SubElement(row_elem, col)
+                    col_elem.text = str(value)
+            
+            xml_evosep_data = minidom.parseString(ET.tostring(root)).toprettyxml(indent="  ")
             
             st.download_button(
                 label="⬇️ Download XML",
