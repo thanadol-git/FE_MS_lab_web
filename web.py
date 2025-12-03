@@ -264,6 +264,8 @@ with sample_order:
 
 with evo_tab:
     if ms_info_output['machine'] == "LIT Stellar":
+        evosep_sample_df = plate_df_long.copy()
+        
         # Evosep method
         st.header("Evosep method for " + ms_info_output['acq_tech']) 
         
@@ -275,11 +277,11 @@ with evo_tab:
         evosep_method = st.text_input("Enter the Evosep experiment machine file (.cam)", "C:\\data\\Evosep\\method.cam")
         st.markdown(f"The Evosep method file is from: <span style='color:red'>{evosep_method}</span>", unsafe_allow_html=True)  
         
-        # Xcalibur iRT method 
-        xcalibur_irt_method = st.text_input("Enter the Xcalibur iRT method file", "C:\\Xcalibur\\methods\\iRT.meth")
-        st.markdown(f"The Xcalibur iRT method file is from: <span style='color:red'>{xcalibur_irt_method}</span>", unsafe_allow_html=True)
+ 
+        # Xcalibur sample SRM/PRM method
+        xcalibur_sample_method = st.text_input("Enter the Xcalibur SRM/PRM method file", "C:\\Xcalibur\\methods\\SRM_PRM.meth")
+        st.markdown(f"The Xcalibur SRM/PRM method file is from: <span style='color:red'>{xcalibur_sample_method}</span>", unsafe_allow_html=True)
 
-        
         # Dropdown evosep_slot 1 to 6
         evosep_slot = st.selectbox("Select Evosep slot", list(range(1, 6)))
         # st.markdown(f"The Evosep slot is: <span style='color:red'>{evosep_slot}</span>", unsafe_allow_html=True)
@@ -288,43 +290,13 @@ with evo_tab:
         
         # Comment 
         evosep_comment = st.text_input("Enter comment for Evosep", ms_info_output['srm_lot'])
-
-            # st.markdown(f"The Evosep comment is: <span style='color:red'>{evosep_comment}</span>", unsafe_allow_html=True)
+        # st.markdown(f"The Evosep comment is: <span style='color:red'>{evosep_comment}</span>", unsafe_allow_html=True)
+                # Add comment 
+        evosep_sample_df['Comment'] = [evosep_comment] * evosep_sample_df.shape[0]
         
-        # Create a tick box for randomizing sample order
-        randomize_checkbox_chronos = st.checkbox("Randomize sample order")
-
-        cols = st.columns(2)
-        with cols[0]:
-            st.markdown("### Xcalibur methods")
-            
-            # Tickbox for including iRT method
-            # Xcalibur iRT method
-            include_irt_method = st.checkbox("Include iRT method", value=True)
-            
-            # Xcalibur sample SRM/PRM method
-            xcalibur_sample_method = st.text_input("Enter the Xcalibur SRM/PRM method file", "C:\\Xcalibur\\methods\\SRM_PRM.meth")
-            # st.markdown(f"The Xcalibur SRM/PRM method file is from: <span style='color:red'>{xcalibur_sample_method}</span>", unsafe_allow_html=True)
-        with cols[1]:
-            st.markdown("### Standby and Prepare Commands")
-            
-            # Tickbox for including standby and prepare commands
-            include_standby_prepare = st.checkbox("Include Standby and Prepare commands", value=True
-            
-            # Standby command location
-            standby_command = st.text_input("Enter the standby command", "C:\\Xcalibur MS standby.cam")
-            # st.markdown(f"The standby command file is from: <span style='color:red'>{standby_command}</span>", unsafe_allow_html=True)
-            
-            # Prepare command file location for 
-            prepare_command = st.text_input("Enter the prepare command", "C:\\Xcalibur MS prepare.cam")
-            # st.markdown(f"The prepare command file is from: <span style='color:red'>{prepare_command}</span>", unsafe_allow_html=True)
-
-
-        ## Create Evosep method file
-
-        evosep_sample_df = plate_df_long.copy()
+        ## Create Evosep method file from plate_df_long
         
-        
+
         # Add 'Xcalibur Method' column
         evosep_sample_df['Xcalibur Method'] = [xcalibur_sample_method] * evosep_sample_df.shape[0]
         # Rename File Name to Sample Name
@@ -336,24 +308,62 @@ with evo_tab:
         # Select only column Sample Name, Xcalibur Method, Source Vial
         evosep_sample_df = evosep_sample_df[['Source Vial', 'Sample Name', 'Xcalibur Method']]
 
-        ## Create Evosep iRT table
-        # Select total numbers of iRT samples
-        iRT_samples = st.selectbox("Select iRT samples", list(range(0, 10 + 1)), index=2)
         
-                
-        
-        
+        # Create a tick box for randomizing sample order
+        randomize_checkbox_chronos = st.checkbox("Randomize sample order")
         if randomize_checkbox_chronos == True:
             evosep_sample_final = evosep_sample_df.sample(frac=1).reset_index(drop=True)
             st.success("Sample order randomized!")
         else:
             evosep_sample_final = evosep_sample_df.copy()
         
+        cols = st.columns(2)
+        with cols[0]:
+            st.markdown("### Xcalibur methods")
+            
+            # Tickbox for including iRT method
+            include_irt_method = st.checkbox("Include iRT method", value=False)
+            
+            if include_irt_method:
+                # Select total numbers of iRT samples
+                iRT_samples = st.number_input("Select iRT samples", min_value=1, max_value=10, value=2, step=1)
+                
+                # Xcalibur iRT method 
+                xcalibur_irt_method = st.text_input("Enter the Xcalibur iRT method file", "C:\\Xcalibur\\methods\\iRT.meth")
+                st.markdown(f"The Xcalibur iRT method file is from: <span style='color:red'>{xcalibur_irt_method}</span>", unsafe_allow_html=True)
+                # iRT sample name
+                iRT_sample_name = st.text_input("Enter iRT sample name", "iRT_Tag_unscheduled")           
+            else:
+                iRT_samples = 0
+                xcalibur_irt_method = ""
+
+            
+        with cols[1]:
+            st.markdown("### Standby and Prepare Commands")
+            
+            # Tickbox for including standby and prepare commands
+            include_standby_prepare = st.checkbox("Include Standby and Prepare commands", value=False)
+            
+            if include_standby_prepare:
+                # Standby command location
+                standby_command = st.text_input("Enter the standby command", "C:\\Xcalibur MS standby.cam")
+                # st.markdown(f"The standby command file is from: <span style='color:red'>{standby_command}</span>", unsafe_allow_html=True)
+                
+                # Prepare command file location for 
+                prepare_command = st.text_input("Enter the prepare command", "C:\\Xcalibur MS prepare.cam")
+                # st.markdown(f"The prepare command file is from: <span style='color:red'>{prepare_command}</span>", unsafe_allow_html=True)
+            else:
+                standby_command = ""
+                prepare_command = ""
+
+
+        ## Create Evosep iRT table
+        
+
+        
         # evosep_sample_final = evosep_sample_df.copy()
         # iRT sample name 
         if iRT_samples != 0:
-            iRT_sample_name = st.text_input("Enter iRT sample name", "iRT_Tag_unscheduled")
-            
             # Create iRT df
             evosep_irt_df = pd.DataFrame({
                 # Column Source vial is list from 1 to iRT_samples
@@ -387,8 +397,7 @@ with evo_tab:
         # Add Xcalibur output dir called Xcalibur Output Dir
         evosep_final_df['Xcalibur Output Dir'] = [evosep_output] * evosep_final_df.shape[0]
         
-        # Add comment 
-        evosep_final_df['Comment'] = [evosep_comment] * evosep_final_df.shape[0]
+
         # Add 3 empty columns called  Pump preparation	Align solvents	Flow to column / idle flow
         evosep_final_df['Pump preparation'] = ""
         evosep_final_df['Align solvents'] = ""
