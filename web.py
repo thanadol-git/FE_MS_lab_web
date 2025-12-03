@@ -410,7 +410,7 @@ with evo_tab:
         if not csv_evosep_data.startswith('\ufeff'):
             csv_evosep_data = '\ufeff' + csv_evosep_data
         
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
         with col1:
             st.download_button(
                 label="Download Evosep order (CSV)",
@@ -434,6 +434,25 @@ with evo_tab:
                 file_name=evosep_xml_name,
                 mime='application/xml'
             )
+        
+        with col3:
+            # Add copy to clipboard button for XML data
+            if st.button("📋 Copy XML to Clipboard"):
+                st.write("""
+                <script>
+                navigator.clipboard.writeText(`""" + xml_evosep_data.replace('`', '\\`') + """`);
+                </script>
+                """, unsafe_allow_html=True)
+                st.success("XML copied to clipboard!")
+            
+        
+        # Display XML results
+        st.markdown("### XML Preview")
+        # Show expandable XML preview
+        with st.expander("View XML (click to expand)"):
+            # Show only first 2000 characters of XML
+            xml_preview = xml_evosep_data 
+            st.code(xml_preview, language="xml")
             
 with sdrf_tab:
     st.header("SDRF")
