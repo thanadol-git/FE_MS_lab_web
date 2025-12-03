@@ -21,5 +21,5 @@ SDRF
 - Making SDRF from webapp
 
 ## PRM 
-- Fix iRT number adding 0
+- Fix disclaimer on sensitive data
 - 
