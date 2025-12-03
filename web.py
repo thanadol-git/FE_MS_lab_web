@@ -271,13 +271,24 @@ with evo_tab:
         evosep_output = st.text_input("Enter the directory path to save Evosep method file", uploaded_dir)
         
         # Evosep method file
-        evosep_method = st.text_input("Enter the Evosep experiment machine file", "C:\\data\\Evosep\\method.cam")
+        evosep_method = st.text_input("Enter the Evosep experiment machine file (.cam)", "C:\\data\\Evosep\\method.cam")
         st.markdown(f"The Evosep method file is from: <span style='color:red'>{evosep_method}</span>", unsafe_allow_html=True)  
+        
+        # Dropdown evosep_slot 1 to 6
+        evosep_slot = st.selectbox("Select Evosep slot", list(range(1, 6)))
+        # st.markdown(f"The Evosep slot is: <span style='color:red'>{evosep_slot}</span>", unsafe_allow_html=True)
+        # Append EvoLot to evosep_slot
+        evosep_slot = "EvoSlot " + str(evosep_slot)
+        
+        # Comment 
+        evosep_comment = st.text_input("Enter comment for Evosep", ms_info_output['srm_lot'])
+
+            # st.markdown(f"The Evosep comment is: <span style='color:red'>{evosep_comment}</span>", unsafe_allow_html=True)
         
         # Create a tick box for randomizing sample order
         randomize_checkbox_chronos = st.checkbox("Randomize sample order")
 
-        cols = st.columns(3)
+        cols = st.columns(2)
         with cols[0]:
             st.markdown("### Xcalibur methods")
             # Xcalibur iRT method 
@@ -296,18 +307,8 @@ with evo_tab:
             # Prepare command file location for 
             prepare_command = st.text_input("Enter the prepare command", "C:\\Xcalibur MS prepare.cam")
             # st.markdown(f"The prepare command file is from: <span style='color:red'>{prepare_command}</span>", unsafe_allow_html=True)
-        with cols[2]:
-            st.markdown("### Evosep slot and comment")
-            # Dropdown evosep_slot 1 to 9
-            evosep_slot = st.selectbox("Select Evosep slot", list(range(1, 6)))
-            # st.markdown(f"The Evosep slot is: <span style='color:red'>{evosep_slot}</span>", unsafe_allow_html=True)
-            # Append EvoLot to evosep_slot
-            evosep_slot = "EvoSlot " + str(evosep_slot)
-            # Comment 
-            evosep_comment = st.text_input("Enter comment for Evosep", ms_info_output['srm_lot'])
 
-            # st.markdown(f"The Evosep comment is: <span style='color:red'>{evosep_comment}</span>", unsafe_allow_html=True)
-        
+
         ## Create Evosep method file
 
         evosep_sample_df = plate_df_long.copy()
@@ -424,17 +425,7 @@ with evo_tab:
             evosep_xml_df.columns = [col.replace(' ', '_').replace('/', '_').replace('(', '').replace(')', '') for col in evosep_xml_df.columns]
             
             evosep_xml_name = "_".join([datetime.now().strftime("%Y%m%d%H%M"), sample_info_output['proj_name'], "Evosep", "Order", sample_info_output['plate_id']]) + ".xml"
-            
-            # Generate XML from DataFrame
-            root = ET.Element('data')
-            for idx, row in evosep_xml_df.iterrows():
-                row_elem = ET.SubElement(root, 'row')
-                row_elem.set('index', str(idx))
-                for col, value in row.items():
-                    col_elem = ET.SubElement(row_elem, col)
-                    col_elem.text = str(value)
-            
-            xml_evosep_data = minidom.parseString(ET.tostring(root)).toprettyxml(indent="  ")
+            xml_evosep_data = evosep_xml_df.to_xml(index=True)
             
             st.download_button(
                 label="⬇️ Download XML",
