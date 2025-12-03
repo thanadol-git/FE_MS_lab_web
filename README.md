@@ -19,7 +19,12 @@ SDRF
 - Read SDRF paper clearly 
 - Apply the latest DIA from Khue and Yasset cell lines 
 - Making SDRF from webapp
+- Confirm with XML files
+
 
 ## PRM 
 - Fix disclaimer on sensitive data
-- 
+- Button for sdrf in other pages
+- Reorganize pre/post-run 
+
+
