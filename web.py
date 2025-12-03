@@ -413,7 +413,7 @@ with evo_tab:
         col1, col2, col3 = st.columns(3)
         with col1:
             st.download_button(
-                label="Download Evosep order (CSV)",
+                label="⬇️ Download CSV",
                 data=csv_evosep_data.encode('utf-8-sig'),
                 file_name=evosep_csv_name,
                 mime='text/csv; charset=utf-8; separator=semicolon'
@@ -429,7 +429,7 @@ with evo_tab:
             xml_evosep_data = evosep_xml_df.to_xml(index=True)
             
             st.download_button(
-                label="Download Evosep order (XML)",
+                label="⬇️ Download XML",
                 data=xml_evosep_data.encode('utf-8'),
                 file_name=evosep_xml_name,
                 mime='application/xml'
