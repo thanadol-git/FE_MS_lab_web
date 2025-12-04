@@ -293,8 +293,7 @@ with evo_tab:
         # Comment 
         evosep_comment = st.text_input("Enter comment for Evosep", ms_info_output['srm_lot'])
         # st.markdown(f"The Evosep comment is: <span style='color:red'>{evosep_comment}</span>", unsafe_allow_html=True)
-                # Add comment 
-        evosep_sample_df['Comment'] = [evosep_comment] * evosep_sample_df.shape[0]
+
         
         ## Create Evosep method file from plate_df_long
         
@@ -317,7 +316,7 @@ with evo_tab:
             evosep_sample_final = evosep_sample_df.sample(frac=1).reset_index(drop=True)
             st.success("Sample order randomized!")
         else:
-            evosep_sample_final = evosep_sample_df.copy()
+            evosep_sample_final = evosep_sample_df.copy() 
         
         cols = st.columns(2)
         with cols[0]:
@@ -399,6 +398,10 @@ with evo_tab:
         # Add Xcalibur output dir called Xcalibur Output Dir
         evosep_final_df['Xcalibur Output Dir'] = [evosep_output] * evosep_final_df.shape[0]
         
+        # Add comment 
+        evosep_final_df['Comment'] = [evosep_comment] * evosep_sample_df.shape[0]
+        
+
 
         # Add 3 empty columns called  Pump preparation	Align solvents	Flow to column / idle flow
         evosep_final_df['Pump preparation'] = ""
@@ -429,7 +432,7 @@ with evo_tab:
         
         # Add download buttons for evosep_final_df
         evosep_csv_name = "_".join([datetime.now().strftime("%Y%m%d%H%M"), sample_info_output['proj_name'], "Evosep", "Order", sample_info_output['plate_id']]) + ".csv"
-        csv_evosep_data = evosep_final_df.to_csv(index=True, sep=';', encoding='utf-8-sig')
+        csv_evosep_data = evosep_final_df.to_csv(index=True, sep=',', encoding='utf-8-sig')
         
         # Ensure UTF-8 BOM is present
         if not csv_evosep_data.startswith('\ufeff'):
