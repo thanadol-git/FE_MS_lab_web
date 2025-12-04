@@ -499,6 +499,8 @@ with evo_tab:
             # Show only first 2000 characters of XML
             xml_preview = xml_evosep_data 
             st.code(xml_preview, language="xml")
+    else:
+        st.warning("Evosep method generation is only available for LIT Stellar machine.")
             
 with sdrf_tab:
     st.header("SDRF")
