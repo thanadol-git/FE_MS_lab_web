@@ -295,9 +295,8 @@ with evo_tab:
         # st.markdown(f"The Evosep comment is: <span style='color:red'>{evosep_comment}</span>", unsafe_allow_html=True)
 
         
-        ## Create Evosep method file from plate_df_long
-        
-
+        # Add Source Tray column
+        evosep_sample_df['Source Tray'] = [evosep_slot] * evosep_sample_df.shape[0]
         # Add 'Xcalibur Method' column
         evosep_sample_df['Xcalibur Method'] = [xcalibur_sample_method] * evosep_sample_df.shape[0]
         # Rename File Name to Sample Name
@@ -307,7 +306,7 @@ with evo_tab:
         evosep_sample_df = evosep_sample_df[evosep_sample_df['Sample'] != 'EMPTY']
 
         # Select only column Sample Name, Xcalibur Method, Source Vial
-        evosep_sample_df = evosep_sample_df[['Source Vial', 'Sample Name', 'Xcalibur Method']]
+        evosep_sample_df = evosep_sample_df[['Source Tray', 'Source Vial', 'Sample Name', 'Xcalibur Method']]
 
         
         # Create a tick box for randomizing sample order
@@ -326,6 +325,9 @@ with evo_tab:
             include_irt_method = st.checkbox("Include iRT method", value=False)
             
             if include_irt_method:
+                # Dropdown evosep_slot 1 to 6
+                iRT_slot = st.selectbox("Select iRT sample slot", list(range(1, 7)))
+                
                 # Select total numbers of iRT samples
                 iRT_samples = st.number_input("Select iRT samples", min_value=1, max_value=10, value=2, step=1)
                 
@@ -367,25 +369,27 @@ with evo_tab:
         if iRT_samples != 0:
             # Create iRT df
             evosep_irt_df = pd.DataFrame({
-                # Column Source vial is list from 1 to iRT_samples
                 "Source Vial": list(range(1, iRT_samples + 1)),
                 "Sample Name": [iRT_sample_name] * iRT_samples,
                 "Xcalibur Method": [xcalibur_irt_method] * iRT_samples
             })
             
-             # Append source vial to Sample Name
+            # Append source vial to Sample Name and add Source Tray column
             evosep_irt_df['Sample Name'] = evosep_irt_df['Sample Name'] + '_' + evosep_irt_df['Source Vial'].astype(str)
+            evosep_irt_df.insert(0, 'Source Tray', iRT_slot)
+            
             # Final Evosep df
             evosep_final_df = pd.concat([evosep_irt_df, evosep_sample_final], ignore_index=True)
+            
         else:
             evosep_final_df = evosep_sample_final
 
         st.markdown("### Download Chronos File")
 
 
-        # Add first and second column name Analysis Method and Srouce Tray, they are evosep_method and evosep_slot
+        # Add first 
         evosep_final_df.insert(0, 'Analysis Method', [evosep_method] * evosep_final_df.shape[0])
-        evosep_final_df.insert(1, 'Source Tray', [evosep_slot] * evosep_final_df.shape[0])
+        
         
         # Add prefix to Sample Name with ms_info_output['acq_tech']
         # evosep_final_df['Sample Name'] = ms_info_output['acq_tech'] + '_' + evosep_final_df['Sample Name']
