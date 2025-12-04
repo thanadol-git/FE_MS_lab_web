@@ -327,7 +327,7 @@ with evo_tab:
             if include_irt_method:
                 # Dropdown evosep_slot 1 to 6
                 iRT_slot = st.selectbox("Select iRT sample slot", list(range(1, 7)))
-                
+                iRT_slot = "EvoSlot " + str(iRT_slot)
                 # Select total numbers of iRT samples
                 iRT_samples = st.number_input("Select iRT samples", min_value=1, max_value=10, value=2, step=1)
                 
@@ -368,7 +368,8 @@ with evo_tab:
         # iRT sample name 
         if iRT_samples != 0:
             # Create iRT df
-            evosep_irt_df = pd.DataFrame({
+            evosep_irt_df = pd.DataFrame({ 
+                # Column Source vial is list from 1 to iRT_samples
                 "Source Vial": list(range(1, iRT_samples + 1)),
                 "Sample Name": [iRT_sample_name] * iRT_samples,
                 "Xcalibur Method": [xcalibur_irt_method] * iRT_samples
@@ -376,6 +377,7 @@ with evo_tab:
             
             # Append source vial to Sample Name and add Source Tray column
             evosep_irt_df['Sample Name'] = evosep_irt_df['Sample Name'] + '_' + evosep_irt_df['Source Vial'].astype(str)
+            
             evosep_irt_df.insert(0, 'Source Tray', iRT_slot)
             
             # Final Evosep df
@@ -432,7 +434,9 @@ with evo_tab:
         else:
             pass
 
-        st.write(evosep_final_df)
+        # Use Streamlit's data editor for interactive dataframe editing
+        st.subheader("Edit your data here:")
+        evosep_final_df = st.data_editor(evosep_final_df, use_container_width=True)
         
         # Add download buttons for evosep_final_df
         evosep_csv_name = "_".join([datetime.now().strftime("%Y%m%d%H%M"), sample_info_output['proj_name'], "Evosep", "Order", sample_info_output['plate_id']]) + ".csv"
