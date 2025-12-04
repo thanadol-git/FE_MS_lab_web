@@ -326,7 +326,7 @@ with evo_tab:
             
             if include_irt_method:
                 # Dropdown evosep_slot 1 to 6
-                iRT_slot = st.selectbox("Select iRT sample slot", list(range(1, 7)))
+                iRT_slot = st.selectbox("Number of pre-run iRT sample to add", list(range(1, 7)))
                 iRT_slot = "EvoSlot " + str(iRT_slot)
                 # Select total numbers of iRT samples
                 iRT_samples = st.number_input("Select iRT samples", min_value=1, max_value=10, value=2, step=1)
