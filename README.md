@@ -4,27 +4,19 @@
 
 ## Priority
 
-SDRF
-- [x] DDA 
-- [x] DIA 
-- [x] SRM : To discuss with David
-- [x] Vanquish : To discuss with David
+### SDRF
+
 - [] sample prep : To discuss with David
 - [] Hamilton : To discuss with David
 
+
+### Web debugging
+- [] Download files system. Should it include all files and plots? 
 
  
 
 ## To do 
 - Read SDRF paper clearly 
-- Apply the latest DIA from Khue and Yasset cell lines 
-- Making SDRF from webapp
-- Confirm with XML files
 
-
-## PRM 
-- Fix disclaimer on sensitive data
-- Button for sdrf in other pages
-- Reorganize pre/post-run 
 
 
