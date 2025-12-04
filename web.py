@@ -399,7 +399,7 @@ with evo_tab:
         evosep_final_df['Xcalibur Output Dir'] = [evosep_output] * evosep_final_df.shape[0]
         
         # Add comment 
-        evosep_final_df['Comment'] = [evosep_comment] * evosep_sample_df.shape[0]
+        evosep_final_df['Comment'] = [evosep_comment] * evosep_final_df.shape[0]
         
 
 
