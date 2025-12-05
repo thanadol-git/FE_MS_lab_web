@@ -33,14 +33,14 @@ with plate_tab:
     st.markdown(f"Plate ID: <span style='color:red'>{sample_info_output['plate_id']}</span>", unsafe_allow_html=True)
 
     # Adding pool or control
-    st.subheader("B. Control or Pool")
-    st.write("Please annotate samples with other cohort besides the main cohort in your plate for example pool samples or control samples. Importantly, The 'EMPTY' wells will be removed in the later steps.")
+    st.subheader("B. Sample annotation")
+    st.write("Please annotate samples with other cohort besides the main cohort in your plate, for example pool samples or control samples. Importantly, The 'EMPTY' wells will be removed in the later steps.")
     # Add disclaimer on sensitive information
     st.markdown("<span style='color:red'>⚠️ **Disclaimer:** Please ensure that the information you provide does not contain any sensitive or personally identifiable information.</span>", unsafe_allow_html=True)
     
     # Text area for input with example_text 8 rows
     example_text = "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1\nCohort_2;RowD\nCohort_2;RowE\nCohort_2;Col9\nCohort_2;Col8"
-    text_input = st.text_area("Example Control, Pool or another cohort", example_text, height=200)
+    text_input = st.text_area("Example: Control, Pool or another cohort", example_text, height=200)
     
     # Process plate positions using the function
     plate_df, replace_pos = process_plate_positions(text_input, sample_info_output['sample_name'])
