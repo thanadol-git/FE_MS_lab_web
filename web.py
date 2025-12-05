@@ -281,8 +281,8 @@ with evo_tab:
         
  
         # Xcalibur sample SRM/PRM method
-        xcalibur_sample_method = st.text_input("Enter the Xcalibur SRM/PRM method file (.meth)", "C:\\Xcalibur\\methods\\SRM_PRM.meth")
-        st.markdown(f"The Xcalibur SRM/PRM method file is from: <span style='color:red'>{xcalibur_sample_method}</span>", unsafe_allow_html=True)
+        xcalibur_sample_method = st.text_input("Enter the Xcalibur method file (.meth)", "C:\\Xcalibur\\methods.meth")
+        st.markdown(f"The Xcalibur method file is from: <span style='color:red'>{xcalibur_sample_method}</span>", unsafe_allow_html=True)
 
         # Dropdown evosep_slot 1 to 6
         evosep_slot = st.selectbox("Select Evosep slot", list(range(1, 7)))
