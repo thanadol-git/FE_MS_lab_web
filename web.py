@@ -618,7 +618,9 @@ with sdrf_tab:
 
     sdrf_df[f'factor value[{factor_value_col}]'] = sdrf_df[f'characteristics[{factor_value_col}]']
 
-    st.write(sdrf_df)
+    # Use Streamlit's data editor for interactive dataframe editing
+    st.subheader("Edit your SDRF data here:")
+    sdrf_df = st.data_editor(sdrf_df, use_container_width=True)
     
     # Download SDRF file
     # fix datetime to YYMMDD
