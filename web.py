@@ -319,10 +319,10 @@ with evo_tab:
         
         cols = st.columns(2)
         with cols[0]:
-            st.markdown("### Pre-run: Xcalibur methods")
+            st.markdown("### Pre-run: iRT calibration")
             
             # Tickbox for including iRT method
-            include_irt_method = st.checkbox("Include iRT method", value=False)
+            include_irt_method = st.checkbox("Include iRT standards", value=False)
             
             if include_irt_method:
                 # Dropdown evosep_slot 1 to 6
