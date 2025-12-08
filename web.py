@@ -635,12 +635,12 @@ with sdrf_tab:
     for i in range(len(ms_info_output['enz_accession_list'])):
         sdrf_tsv = sdrf_tsv.replace(f'comment[cleavage agent details{i}]', 'comment[cleavage agent details]')
 
-    st.download_button(
-        label="Download SDRF",
-        data=sdrf_tsv.encode('utf-8-sig'),
-        file_name=sdrf_filename,
-        mime='text/tab-separated-values; charset=utf-8'
-    )
+st.download_button(
+    label="Download SDRF",
+    data=sdrf_tsv.encode('utf-8'),
+    file_name=sdrf_filename,
+    mime='text/tab-separated-values; charset=utf-8'
+)
 
     # Add link to website github.com/thanadol-git/quantms_example/
     url = "https://www.github.com/thanadol-git/quantms_example/"
