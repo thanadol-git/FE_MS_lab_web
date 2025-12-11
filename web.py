@@ -645,5 +645,3 @@ with sdrf_tab:
     # Add link to website github.com/thanadol-git/quantms_example/
     url = "https://www.github.com/thanadol-git/quantms_example/"
     st.markdown("comment[cleavage agent details'] will be fixed with the downloaded file. Pandas cannot handle two columns with the same name. check out this [link](%s)" % url)
-
-    
