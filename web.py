@@ -229,8 +229,8 @@ with sample_order:
     # Add wash and qc standard after every 8 rows
     output_with_wash = pd.concat([pd.concat([chunk, wash_df], ignore_index=True) for chunk in chunks], ignore_index=True)
     
-    ### SRM plate
-    if ms_info_output['acq_tech'] == "SRM":
+    ### SRM/PRM plate
+    if ms_info_output['acq_tech'] in ["SRM", "PRM"]:
         output_with_wash = output_order_df_rand
     
     # concat wash and qc dataframes
@@ -601,8 +601,8 @@ with sdrf_tab:
         data_file_prop["MS1 scan range"] = ["400-1250 m/z"] * data_file_prop.shape[0]
         data_file_prop["MS2 scan range"] = ["100-2000 m/z"] * data_file_prop.shape[0]
 
-    # For SRM add ProteomeEdge lot
-    if ms_info_output['acq_tech'] == "SRM":
+    # For SRM/PRM add ProteomeEdge lot
+    if ms_info_output['acq_tech'] in ["SRM", "PRM"]:
         data_file_prop['ProteomeEdge'] = [ms_info_output['srm_lot']] * data_file_prop.shape[0]
 
     # rename
