@@ -16,7 +16,7 @@ ms_info_output, sample_info_output = create_sidebar()
 
 
 # Create three tabs
-intro_tab, plate_tab, sample_order, evo_tab, sdrf_tab = st.tabs(["Intro", "Plate Design", "Xcalibur", "Chronos", "SDRF"])
+intro_tab, plate_tab, sample_order, evo_tab, sdrf_tab, skyline_tab = st.tabs(["Intro", "Plate Design", "Xcalibur", "Chronos", "SDRF", "Skyline"])
 
 with intro_tab:
     intro_detail()
@@ -229,8 +229,8 @@ with sample_order:
     # Add wash and qc standard after every 8 rows
     output_with_wash = pd.concat([pd.concat([chunk, wash_df], ignore_index=True) for chunk in chunks], ignore_index=True)
     
-    ### SRM plate
-    if ms_info_output['acq_tech'] == "SRM":
+    ### SRM/PRM plate
+    if ms_info_output['acq_tech'] in ["SRM", "PRM"]:
         output_with_wash = output_order_df_rand
     
     # concat wash and qc dataframes
@@ -601,8 +601,8 @@ with sdrf_tab:
         data_file_prop["MS1 scan range"] = ["400-1250 m/z"] * data_file_prop.shape[0]
         data_file_prop["MS2 scan range"] = ["100-2000 m/z"] * data_file_prop.shape[0]
 
-    # For SRM add ProteomeEdge lot
-    if ms_info_output['acq_tech'] == "SRM":
+    # For SRM/PRM add ProteomeEdge lot
+    if ms_info_output['acq_tech'] in ["SRM", "PRM"]:
         data_file_prop['ProteomeEdge'] = [ms_info_output['srm_lot']] * data_file_prop.shape[0]
 
     # rename
@@ -645,3 +645,59 @@ with sdrf_tab:
     # Add link to website github.com/thanadol-git/quantms_example/
     url = "https://www.github.com/thanadol-git/quantms_example/"
     st.markdown("comment[cleavage agent details'] will be fixed with the downloaded file. Pandas cannot handle two columns with the same name. check out this [link](%s)" % url)
+
+# Skyline tab 
+with skyline_tab:
+    st.header("Skyline")
+
+    # Upload SDRF file
+    st.markdown("Use SDRF file or Upload your SDRF file here to generate Skyline annotation file.")
+    sdrf_upload = st.file_uploader("Upload SDRF file", type=["sdrf.tsv", "tsv",])
+
+    # Add dropdown for selecting file to process
+    anno_file = st.selectbox("Select SDRF file to process", ["Use generated SDRF", "Upload SDRF file"], key="sdrf_choice")
+    
+    if anno_file == "Upload SDRF file":
+        if sdrf_upload is not None:
+            upload_sdrf_df = pd.read_csv(sdrf_upload, sep='\t', dtype=str)
+            st.success("SDRF file uploaded successfully!")
+        else:
+            st.warning("Please upload an SDRF file.")
+            st.stop()
+    else:
+        st.info("Using generated SDRF file from previous section.")
+        # Use the sdrf_df from previous section
+        if 'sdrf_df' not in locals():
+            st.warning("Please generate the SDRF file in the SDRF section first.")
+            st.stop()
+        else:
+            upload_sdrf_df = sdrf_df.copy()
+    
+    
+    # Take columns with charactersistics[] from sdrf_df and also comment[data file]
+    char_cols = [col for col in upload_sdrf_df.columns if col.startswith('characteristics[')]
+    # data_file_col = [col for col in sdrf_df.columns if col == 'comment[data file]']
+    skyline_anno = upload_sdrf_df[char_cols]
+    # skyline_anno = sdrf_df[char_cols + data_file_col]
+    
+    # Rename all colnames to remove characteristics[]
+    skyline_anno.columns = [col.replace('characteristics[', '').replace(']', '') for col in skyline_anno.columns]
+    
+    st.subheader("Sample Annotations for Skyline")
+    
+    
+    # Display skyline_anno with data editor 
+    skyline_anno = st.data_editor(skyline_anno, use_container_width=True)
+    
+    
+    # Download skyline_anno as csv
+    skyline_anno_filename = "_".join([datetime.now().strftime("%Y%m%d%H%M"), sample_info_output['proj_name'], "Skyline", "Annotations", sample_info_output['plate_id']]) + ".csv"
+    skyline_anno_csv = skyline_anno.to_csv(index=False, encoding='utf-8')
+    
+    st.download_button(
+        label="Download Skyline Annotation",
+        data=skyline_anno_csv.encode('utf-8'),
+        file_name=skyline_anno_filename,
+        mime='text/csv; charset=utf-8'
+    )
+    
