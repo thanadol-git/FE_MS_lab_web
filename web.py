@@ -31,6 +31,80 @@ except ImportError:
 
 SERVER_URL = "https://hypha.aicell.io"
 
+INJECTION_POS_COLORS = {"Red": "red", "Green": "green", "Blue": "blue"}
+INJECTION_POS_LETTERS = {"Red": "R", "Green": "G", "Blue": "B"}
+EMPTY_WELL_LABEL = "EMPTY"
+
+
+def _ensure_bom(text: str) -> str:
+    if text.startswith("\ufeff"):
+        return text
+    return "\ufeff" + text
+
+
+def _safe_run(coro):
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    loop.run_until_complete(coro)
+
+
+def _init_plate_replace_text(example_text: str) -> None:
+    if "pending_plate_update" in st.session_state:
+        st.session_state.replace_pos_text = st.session_state.pending_plate_update
+        del st.session_state.pending_plate_update
+    if "replace_pos_text" not in st.session_state:
+        st.session_state.replace_pos_text = example_text
+
+
+def _build_file_name(row, ms_info, sample_info, date_injection: str) -> str:
+    parts = [
+        ms_info["acq_tech"],
+        date_injection,
+        sample_info["proj_name"],
+        sample_info["plate_id"],
+        row["Position"],
+    ]
+    return "_".join(parts)
+
+
+def _build_download_name(parts, suffix: str) -> str:
+    return "_".join(parts) + suffix
+
+
+def _chunk_df(df, size: int):
+    return [df[i : i + size] for i in range(0, len(df), size)]
+
+
+def _insert_wash_after_chunks(df, wash_df, size: int):
+    chunks = _chunk_df(df, size)
+    return pd.concat(
+        [pd.concat([chunk, wash_df], ignore_index=True) for chunk in chunks],
+        ignore_index=True,
+    )
+
+
+def _sanitize_xml_columns(columns):
+    return [
+        col.replace(" ", "_")
+        .replace("/", "_")
+        .replace("(", "")
+        .replace(")", "")
+        for col in columns
+    ]
+
+
+def _create_xml_from_dataframe(df: pd.DataFrame) -> str:
+    root = ET.Element("data")
+    for _, row in df.iterrows():
+        row_elem = ET.SubElement(root, "row")
+        for col_name, value in row.items():
+            col_elem = ET.SubElement(row_elem, col_name)
+            col_elem.text = str(value)
+    return minidom.parseString(ET.tostring(root)).toprettyxml(indent="  ")
+
 
 @schema_function
 def design_plate(plate_design_str: str) -> str:
@@ -157,13 +231,7 @@ def create_agent_chat():
                         pass
 
         # Run the async loop
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-
-        loop.run_until_complete(start_and_chat())
+        _safe_run(start_and_chat())
 
 
 # Import functions from other modules
@@ -212,12 +280,7 @@ with plate_tab:
     # Text area for input with example_text 8 rows
     example_text = "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1\nCohort_2;RowD\nCohort_2;RowE\nCohort_2;Col9\nCohort_2;Col8"
 
-    if "pending_plate_update" in st.session_state:
-        st.session_state.replace_pos_text = st.session_state.pending_plate_update
-        del st.session_state.pending_plate_update
-
-    if "replace_pos_text" not in st.session_state:
-        st.session_state.replace_pos_text = example_text
+    _init_plate_replace_text(example_text)
 
     text_input = st.text_area(
         "Example: Control, Pool or another cohort", key="replace_pos_text", height=200
@@ -251,7 +314,7 @@ with sample_order:
 
     plate_df_long["Source Vial"] = list(range(1, plate_df_long.shape[0] + 1))
     # Filter the plate_df_long to only include the samples
-    plate_df_long = plate_df_long[plate_df_long["Sample"] != "EMPTY"]
+    plate_df_long = plate_df_long[plate_df_long["Sample"] != EMPTY_WELL_LABEL]
 
     # Choices Injection position with select boxes from red green and blue
     injection_pos = st.selectbox(
@@ -259,21 +322,8 @@ with sample_order:
     )
 
     # Determine the color based on the injection position
-    load_color = (
-        "red"
-        if injection_pos == "Red"
-        else "green" if injection_pos == "Green" else "blue"
-    )
-
-    # Lambda function to check the color and return the corresponding letter
-    color_to_letter = lambda color: (
-        "R"
-        if color == "Red"
-        else "B" if color == "Blue" else "G" if color == "Green" else ""
-    )
-
-    # Get the corresponding letter for the selected injection position
-    injection_pos_letter = color_to_letter(injection_pos)
+    load_color = INJECTION_POS_COLORS.get(injection_pos, "blue")
+    injection_pos_letter = INJECTION_POS_LETTERS.get(injection_pos, "")
     # Add color for both injection position and letter
     st.write(
         f"The selected injection position is <span style='color:{load_color}'>{injection_pos}</span> with corresponding letter <span style='color:{load_color}'>{injection_pos_letter}</span>.",
@@ -349,16 +399,11 @@ with sample_order:
     plate_df_long["Path"] = uploaded_dir
     # File name
     plate_df_long["File Name"] = plate_df_long.apply(
-        lambda row: "_".join(
-            [
-                ms_info_output["acq_tech"],
-                date_injection,
-                sample_info_output["proj_name"],
-                sample_info_output["plate_id"],
-                row["Position"],
-            ]
-        ),
+        _build_file_name,
         axis=1,
+        ms_info=ms_info_output,
+        sample_info=sample_info_output,
+        date_injection=date_injection,
     )
     plate_df_long["Position"] = injection_pos_letter + plate_df_long["Position"]
 
@@ -468,38 +513,30 @@ with sample_order:
         "Randomize sample order", key="randomize_xcalibur"
     )
 
-    if randomize_checkbox_xcalibur == True:
+    if randomize_checkbox_xcalibur:
         st.success("Sample order randomized!")
         output_order_df_rand = output_order_df.sample(frac=1).reset_index(drop=True)
     else:
         output_order_df_rand = output_order_df.copy()
 
     ## export order sample name
-    sample_order_name = (
-        "_".join(
-            [
-                datetime.now().strftime("%Y%m%d%H%M"),
-                sample_info_output["proj_name"],
-                "Sample",
-                "Order",
-                sample_info_output["plate_id"],
-            ]
-        )
-        + ".csv"
+    sample_order_name = _build_download_name(
+        [
+            datetime.now().strftime("%Y%m%d%H%M"),
+            sample_info_output["proj_name"],
+            "Sample",
+            "Order",
+            sample_info_output["plate_id"],
+        ],
+        ".csv",
     )
 
     ## export order sample
     ### DIA/DDA plate
 
     # Bind row from wash_df after every 8 rows in output_order_df
-    chunks = [
-        output_order_df_rand[i : i + 8] for i in range(0, len(output_order_df_rand), 8)
-    ]
     # Add wash and qc standard after every 8 rows
-    output_with_wash = pd.concat(
-        [pd.concat([chunk, wash_df], ignore_index=True) for chunk in chunks],
-        ignore_index=True,
-    )
+    output_with_wash = _insert_wash_after_chunks(output_order_df_rand, wash_df, 8)
 
     ### SRM/PRM plate
     if ms_info_output["acq_tech"] in ["SRM", "PRM"]:
@@ -520,9 +557,7 @@ with sample_order:
 
     # Convert DataFrame to CSV with UTF-8 encoding
     csv_data = output_with_wash.to_csv(index=False, encoding="utf-8-sig")
-
-    # Add 'Type=4,,,,' to the beginning of the CSV data with proper encoding
-    csv_data = "\ufeff" + "Bracket Type=4,,,,\n" + csv_data
+    csv_data = _ensure_bom("Bracket Type=4,,,,\n" + csv_data)
 
     ## Download button for export file
 
@@ -541,7 +576,7 @@ with sample_order:
 
 
 with evo_tab:
-    if ms_info_output["machine"] == "LIT Stellar":
+    # (Removed conditional: unindented the block below)
         evosep_sample_df = plate_df_long.copy()
 
         # Evosep method
@@ -597,7 +632,9 @@ with evo_tab:
         evosep_sample_df = evosep_sample_df.rename(columns={"File Name": "Sample Name"})
 
         # Filter EMPTY wells
-        evosep_sample_df = evosep_sample_df[evosep_sample_df["Sample"] != "EMPTY"]
+        evosep_sample_df = evosep_sample_df[
+            evosep_sample_df["Sample"] != EMPTY_WELL_LABEL
+        ]
 
         # Select only column Sample Name, Xcalibur Method, Source Vial
         evosep_sample_df = evosep_sample_df[
@@ -606,7 +643,7 @@ with evo_tab:
 
         # Create a tick box for randomizing sample order
         randomize_checkbox_chronos = st.checkbox("Randomize sample order")
-        if randomize_checkbox_chronos == True:
+        if randomize_checkbox_chronos:
             evosep_sample_final = evosep_sample_df.sample(frac=1).reset_index(drop=True)
             st.success("Sample order randomized!")
         else:
@@ -703,7 +740,7 @@ with evo_tab:
         else:
             evosep_final_df = evosep_sample_final
 
-        ### Download Chronos File")
+        # Download Chronos file
 
         # Add first
         evosep_final_df.insert(
@@ -732,9 +769,7 @@ with evo_tab:
         evosep_final_df["Flow to column / idle flow"] = ""
 
         if include_standby_prepare:
-
             # Copy evosep_final_df to evo_Standby_df and remove all contents
-
             evo_standby_df = evosep_final_df.copy()
             evo_standby_df.loc[:, :] = ""
             # Add standby_command to first row and first column
@@ -750,33 +785,28 @@ with evo_tab:
             evosep_final_df = pd.concat(
                 [evosep_final_df, evo_standby_df], ignore_index=True
             )
-        else:
-            pass
 
         # Use Streamlit's data editor for interactive dataframe editing
         st.subheader("Edit your data here:")
         evosep_final_df = st.data_editor(evosep_final_df, use_container_width=True)
 
         # Add download buttons for evosep_final_df
-        evosep_csv_name = (
-            "_".join(
-                [
-                    datetime.now().strftime("%Y%m%d%H%M"),
-                    sample_info_output["proj_name"],
-                    "Evosep",
-                    "Order",
-                    sample_info_output["plate_id"],
-                ]
-            )
-            + ".csv"
+        evosep_csv_name = _build_download_name(
+            [
+                datetime.now().strftime("%Y%m%d%H%M"),
+                sample_info_output["proj_name"],
+                "Evosep",
+                "Order",
+                sample_info_output["plate_id"],
+            ],
+            ".csv",
         )
         csv_evosep_data = evosep_final_df.to_csv(
             index=True, sep=",", encoding="utf-8-sig"
         )
 
         # Ensure UTF-8 BOM is present
-        if not csv_evosep_data.startswith("\ufeff"):
-            csv_evosep_data = "\ufeff" + csv_evosep_data
+        csv_evosep_data = _ensure_bom(csv_evosep_data)
 
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -791,37 +821,21 @@ with evo_tab:
             # Add download button for evosep_final_df as XML
             # Replace invalid XML tag characters in column names
             evosep_xml_df = evosep_final_df.copy()
-            evosep_xml_df.columns = [
-                col.replace(" ", "_")
-                .replace("/", "_")
-                .replace("(", "")
-                .replace(")", "")
-                for col in evosep_xml_df.columns
-            ]
+            evosep_xml_df.columns = _sanitize_xml_columns(evosep_xml_df.columns)
 
-            evosep_xml_name = (
-                "_".join(
-                    [
-                        datetime.now().strftime("%Y%m%d%H%M"),
-                        sample_info_output["proj_name"],
-                        "Evosep",
-                        "Order",
-                        sample_info_output["plate_id"],
-                    ]
-                )
-                + ".xml"
+            evosep_xml_name = _build_download_name(
+                [
+                    datetime.now().strftime("%Y%m%d%H%M"),
+                    sample_info_output["proj_name"],
+                    "Evosep",
+                    "Order",
+                    sample_info_output["plate_id"],
+                ],
+                ".xml",
             )
 
             # Generate XML using ElementTree and minidom
-            root = ET.Element("data")
-            for idx, row in evosep_xml_df.iterrows():
-                row_elem = ET.SubElement(root, "row")
-                for col_name, value in row.items():
-                    col_elem = ET.SubElement(row_elem, col_name)
-                    col_elem.text = str(value)
-
-            xml_str = minidom.parseString(ET.tostring(root)).toprettyxml(indent="  ")
-            xml_evosep_data = xml_str
+            xml_evosep_data = _create_xml_from_dataframe(evosep_xml_df)
 
             st.download_button(
                 label="⬇️ Download XML",
@@ -852,10 +866,6 @@ with evo_tab:
             # Show only first 2000 characters of XML
             xml_preview = xml_evosep_data
             st.code(xml_preview, language="xml")
-    else:
-        st.warning(
-            "Evosep method generation is only available for LIT Stellar machine."
-        )
 
 with sdrf_tab:
     st.header("SDRF")
@@ -1013,21 +1023,18 @@ with sdrf_tab:
 
     # Download SDRF file
     # fix datetime to YYMMDD
-    sdrf_filename = (
-        "_".join(
-            [
-                datetime.now().strftime("%Y%m%d"),
-                sample_info_output["proj_name"],
-                sample_info_output["plate_id"],
-            ]
-        )
-        + ".sdrf.tsv"
+    sdrf_filename = _build_download_name(
+        [
+            datetime.now().strftime("%Y%m%d"),
+            sample_info_output["proj_name"],
+            sample_info_output["plate_id"],
+        ],
+        ".sdrf.tsv",
     )
     sdrf_tsv = sdrf_df.to_csv(sep="\t", index=False, encoding="utf-8-sig")
 
     # Ensure UTF-8 BOM is present
-    if not sdrf_tsv.startswith("\ufeff"):
-        sdrf_tsv = "\ufeff" + sdrf_tsv
+    sdrf_tsv = _ensure_bom(sdrf_tsv)
 
     # In sdrf_tsv replace first row where comment[cleavage agent details] with any numbers to just comment[cleavage agent details]
     for i in range(len(ms_info_output["enz_accession_list"])):
@@ -1109,17 +1116,15 @@ with skyline_tab:
     skyline_anno = st.data_editor(skyline_anno, use_container_width=True)
 
     # Download skyline_anno as csv
-    skyline_anno_filename = (
-        "_".join(
-            [
-                datetime.now().strftime("%Y%m%d%H%M"),
-                sample_info_output["proj_name"],
-                "Skyline",
-                "Annotations",
-                sample_info_output["plate_id"],
-            ]
-        )
-        + ".csv"
+    skyline_anno_filename = _build_download_name(
+        [
+            datetime.now().strftime("%Y%m%d%H%M"),
+            sample_info_output["proj_name"],
+            "Skyline",
+            "Annotations",
+            sample_info_output["plate_id"],
+        ],
+        ".csv",
     )
     skyline_anno_csv = skyline_anno.to_csv(index=False, encoding="utf-8")
 
