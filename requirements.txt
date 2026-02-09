@@ -4,3 +4,4 @@ plotly
 matplotlib
 seaborn
 mitosheet
+hypha-rpc
