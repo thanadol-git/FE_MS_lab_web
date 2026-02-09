@@ -7,8 +7,20 @@ from xml.dom import minidom
 
 import pandas as pd
 import streamlit as st
-from hypha_rpc import connect_to_server
-from hypha_rpc.utils.schema import schema_function
+try:
+    from hypha_rpc import connect_to_server
+    from hypha_rpc.utils.schema import schema_function
+except Exception:
+    # hypha_rpc is an optional dependency used for the OpenAI/Hypha agent integration.
+    # If it's missing, provide safe fallbacks so the app continues to run.
+    connect_to_server = None
+    def schema_function(fn=None, **kwargs):
+        # Allow use as @schema_function or @schema_function(...)
+        if fn is None:
+            def decorator(f):
+                return f
+            return decorator
+        return fn
 
 from func.plate_plot import plate_dfplot, process_plate_positions
 
@@ -105,6 +117,14 @@ def create_agent_chat():
     if st.button("Run Agent"):
         if not api_key:
             st.warning("Please enter an OpenAI API Key.")
+            return
+
+        # If hypha_rpc is not installed, disable the agent functionality with a clear message.
+        if connect_to_server is None:
+            st.error(
+                "Hypha RPC client is not available. Agent features are disabled. "
+                "Install the optional dependency 'hypha-rpc' to enable this."
+            )
             return
 
         async def start_and_chat():
