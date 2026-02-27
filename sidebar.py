@@ -13,7 +13,7 @@ def sample_info():
     }
     
     # Project
-    proj_name = st.sidebar.text_input("Enter your project name", "Project X")
+    proj_name = st.sidebar.text_input("Enter your project name", "Project_X")    
     # Organism
     organism = st.sidebar.selectbox("Select your organism", list(organism_species.keys()), index=0)
     # Sample type
@@ -27,6 +27,20 @@ def sample_info():
     if not plate_id:
         plate_id = sample_name
 
+    # INSERT_YOUR_CODE
+    # Warning if proj_name, plate_id or sample_name contain spaces
+    space_warnings = []
+    if " " in proj_name:
+        space_warnings.append("Project name")
+    if " " in plate_id:
+        space_warnings.append("Plate ID")
+    if " " in sample_name:
+        space_warnings.append("Cohort name")
+
+    if space_warnings:
+        st.sidebar.warning(
+            f"Warning: {'/'.join(space_warnings)} should not contain spaces."
+        )
 
 
     # return all values
