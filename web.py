@@ -894,7 +894,10 @@ with sdrf_tab:
         "plasma": "blood plasma",
         "serum": "blood serum",
     }
-    organism_part = sample_to_part.get(sample_info_output["sample"].lower(), sample_info_output["sample"])
+    # For others, use 'not available'
+    organism_part = sample_to_part.get(sample_info_output["sample"].lower(), "not available")
+    # This check is redundant since we're reassigning the same value.
+    
     sample_prop["organism part"] = [organism_part] * sample_prop.shape[0]
     # Plate
     sample_prop["plate"] = [sample_info_output["plate_id"]] * sample_prop.shape[0]
