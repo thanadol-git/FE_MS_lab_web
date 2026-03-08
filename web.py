@@ -889,10 +889,13 @@ with sdrf_tab:
         sample_info_output["organism_species"]
     ] * sample_prop.shape[0]
     # Organism part
-    # Encode 'Plasma' as 'blood plasma', else as original
-    sample_prop["organism part"] = [
-        "blood plasma" if sample_info_output["sample"].lower() == "plasma" else sample_info_output["sample"]
-    ] * sample_prop.shape[0]
+    # Map sample type to organism part using a dictionary
+    sample_to_part = {
+        "plasma": "blood plasma",
+        "serum": "blood serum",
+    }
+    organism_part = sample_to_part.get(sample_info_output["sample"].lower(), sample_info_output["sample"])
+    sample_prop["organism part"] = [organism_part] * sample_prop.shape[0]
     # Plate
     sample_prop["plate"] = [sample_info_output["plate_id"]] * sample_prop.shape[0]
     # Project
