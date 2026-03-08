@@ -931,7 +931,7 @@ with sdrf_tab:
     sample_prop["assay name"] = [
         "run " + str(i) for i in range(1, sample_prop.shape[0] + 1)
     ]
-    sample_prop["technology type"] = "proteomics profiling by mass spectrometry"
+    sample_prop["technology type"] = "proteomic profiling by mass spectrometry"
 
     # Data file properties (MS)
     data_file_prop = pd.DataFrame(
