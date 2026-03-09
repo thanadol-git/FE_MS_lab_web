@@ -869,7 +869,7 @@ with evo_tab:
 
 with sdrf_tab:
     st.header("SDRF")
-    ms_file = st.selectbox("MS file output", ["RAW", "mzML"])
+    ms_file = st.selectbox("MS file output", ["raw", "mzML"])
     # Collision energy
     collision_energy = st.text_input("Collision Energy (NCE)", "27")
 
