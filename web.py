@@ -1016,8 +1016,9 @@ with sdrf_tab:
     sdrf_df = pd.concat([sample_prop, data_file_prop], axis=1)
 
     factor_value_col = st.selectbox(
-        "Select column for factor value", sample_prop_columns
+        "Select column for factor value", sample_prop_columns, index=sample_prop_columns.index("Sample") if "Sample" in sample_prop_columns else 0
     )
+
 
     # Add factor values based on selected columns
     # Select box
