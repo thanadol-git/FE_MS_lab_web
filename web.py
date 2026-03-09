@@ -642,7 +642,7 @@ with evo_tab:
     ]
 
     # Create a tick box for randomizing sample order
-    randomize_checkbox_chronos = st.checkbox("Randomize sample order")
+    randomize_checkbox_chronos = st.checkbox("Randomize sample order", value=True)
     if randomize_checkbox_chronos:
         evosep_sample_final = evosep_sample_df.sample(frac=1).reset_index(drop=True)
         st.success("Sample order randomized!")
