@@ -510,7 +510,7 @@ with sample_order:
 
     # Add randomized sample order tickbox
     randomize_checkbox_xcalibur = st.checkbox(
-        "Randomize sample order", key="randomize_xcalibur"
+        "Randomize sample order", key="randomize_xcalibur", value=True
     )
 
     if randomize_checkbox_xcalibur:
