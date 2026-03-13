@@ -74,7 +74,7 @@ def ms_info():
 
     # Acquisition technique accession
     ms_acquisition = {
-        "DIA": "NT=Data Independent Acquisition;AC=MS:1002804",
+        "DIA": "NT=Data-Independent Acquisition;AC=NCIT:C161786",
         "DDA": "NT=Data-Dependent Acquisition;AC=NCIT:C161785",
         "PRM": "NT=Parallel Reaction Monitoring;AC=MS:1002956",
         "SRM": "NT=Selected Reaction Monitoring;AC=MS:1000423"
