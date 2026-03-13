@@ -88,6 +88,7 @@ def process_plate_positions(text_input, sample_name):
     
     # Split text and clean empty lines
     replace_pos = text_input.split('\n')
+    # Remove empty lines
     replace_pos = [item for item in replace_pos if item.strip() != '']
     
     # Write warning message if replace_pos does not have ; as one special character
