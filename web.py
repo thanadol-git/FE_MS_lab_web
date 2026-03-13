@@ -111,7 +111,7 @@ def design_plate(plate_design_str: str) -> str:
     """Design a plate by setting the replacement positions text.
 
     The input string should be formatted as 'Label;Location' separated by newlines.
-    Example: 'Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1\nCohort_2;RowD\nCohort_2;RowE\nCohort_2;Col9\nCohort_2;Col8'
+    Example: 'Pool;A7,A8,10\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1\nCohort_2;RowD\nCohort_2;RowE\nCohort_2;Col9\nCohort_2;Col8'
     """
     st.session_state["pending_plate_update"] = plate_design_str
     return "Successfully updated plate design."

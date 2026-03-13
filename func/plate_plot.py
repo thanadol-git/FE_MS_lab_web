@@ -85,23 +85,62 @@ def process_plate_positions(text_input, sample_name):
         tuple: (plate_df, replace_pos) - DataFrame and processed position list
     """
 
-    
     # Split text and clean empty lines
     replace_pos = text_input.split('\n')
+    
     # Remove empty lines
     replace_pos = [item for item in replace_pos if item.strip() != '']
-    
+
     # Write warning message if replace_pos does not have ; as one special character
+    # Allow comma-separated positions (e.g. Sample1;A1,A3,A5), so do not treat ',' as invalid.
     for item in replace_pos:
-        if ';' not in item or item.count(';') != 1 or any(char in item for char in ['?', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '+', '=', '{', '}', '[', ']', '|', '\\', ':', '"', "'", '<', '>', ',', '.', '/', '~','`']):
+        if (
+            ';' not in item
+            or item.count(';') != 1
+            or any(
+                char in item
+                for char in [
+                    '?',
+                    '!',
+                    '@',
+                    '#',
+                    '$',
+                    '%',
+                    '^',
+                    '&',
+                    '*',
+                    '(',
+                    ')',
+                    '+',
+                    '=',
+                    '{',
+                    '}',
+                    '[',
+                    ']',
+                    '|',
+                    '\\',
+                    ':',
+                    '"',
+                    "'",
+                    '<',
+                    '>',
+                    '.',
+                    '/',
+                    '~',
+                    '`',
+                ]
+            )
+        ):
             st.warning(f"Invalid format: {item}. It should be like 'Cohort_2;Col8'.")
             break
     
     # Filter row in text that contain 'Col' or 'Row' in replace_pos
     colrow_label = [item for item in replace_pos if ('Col' in item or 'Row' in item)]
+    
     # Remove row with 'Col' or 'Row in replace_pos
     replace_pos = [item for item in replace_pos if not ('Col' in item or 'Row' in item)]
     
+    ## Work with Col and Row
     # Check Col and Row then append to replace pos each well
     for item in colrow_label:
         if ';' in item:
@@ -118,6 +157,34 @@ def process_plate_positions(text_input, sample_name):
                 st.warning(f"Invalid position format: {item}. It should be like 'Cohort_2;RowA' or 'Cohort_2;Col8'.")
         else:
             st.warning(f"Invalid format: {item}. It should be like 'Cohort_2;Col8'.")
+
+    # Expand entries with multiple comma-separated positions, e.g. "Sample1;A1,A3,A5"
+    expanded_replace_pos = []
+    for item in replace_pos:
+        if ';' in item:
+            text, pos = item.split(';')
+            # Split by comma to allow multiple positions
+            pos_parts = [p.strip() for p in pos.split(',') if p.strip() != '']
+            if len(pos_parts) > 1:
+                # Validate each individual position (e.g. A1, B12)
+                for p in pos_parts:
+                    if (
+                        len(p) >= 2
+                        and p[0] in 'ABCDEFGH'
+                        and p[1:].isdigit()
+                        and 1 <= int(p[1:]) <= 12
+                    ):
+                        expanded_replace_pos.append(f"{text};{p}")
+                    else:
+                        st.warning(
+                            f"Invalid position format: {text};{p}. It should be like 'Sample1;A1'."
+                        )
+            else:
+                expanded_replace_pos.append(item)
+        else:
+            expanded_replace_pos.append(item)
+
+    replace_pos = expanded_replace_pos
 
     # Write a warning message if the position is mentioned more than one time in text area
     if len(replace_pos) != len(set(replace_pos)):
