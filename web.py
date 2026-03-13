@@ -278,7 +278,7 @@ with plate_tab:
     )
 
     # Text area for input with example_text 8 rows
-    example_text = "Pool;A7\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1\nCohort_2;RowD\nCohort_2;RowE\nCohort_2;Col9\nCohort_2;Col8"
+    example_text = "Pool;A7,A8,A12\nControl;G12\nControl;H12\nCohort_2;C8\nEMPTY;A1\nCohort_2;RowD\nCohort_2;RowE\nCohort_2;Col9\nCohort_2;Col8"
 
     _init_plate_replace_text(example_text)
 
